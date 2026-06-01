@@ -1,13 +1,10 @@
 import pandas as pd
 import pymongo
 import json
-import certifi
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
-ca = certifi.where()
 
 MONGO_DB_URL = os.getenv("MONGO_DB_URL", "")
 
@@ -21,8 +18,8 @@ if MONGO_DB_URL and MONGO_DB_URL != "":
         # Try with SSL certificate verification
         MONGO_CLIENT = pymongo.MongoClient(
             MONGO_DB_URL,
-            tlsCAFile=ca,
-            serverSelectionTimeoutMS=5000
+            serverSelectionTimeoutMS=5000,
+            retryWrites=True
         )
         
         # Test connection
