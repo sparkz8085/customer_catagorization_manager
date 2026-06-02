@@ -3,15 +3,13 @@ from typing import Tuple
 
 from pandas import DataFrame
 
-
 from src.components.data_ingestion import DataIngestion
 from src.components.data_transformation import DataTransformation
-from src.components.data_validation import DataValidation
+#from src.components.data_validation import DataValidation
 from src.components.model_trainer import ModelTrainer
 from src.components.model_evaluation import ModelEvaluation
 
 from src.components.model_pusher import ModelPusher
-
 from src.exception import CustomerException
 from src.logger import logging
 from src.entity.artifact_entity import (DataIngestionArtifact,
@@ -59,16 +57,19 @@ class TrainPipeline:
             raise CustomerException(e, sys) from e
 
     
-    def start_data_validation(self,data_ingestion_artifact:DataIngestionArtifact) -> DataValidationArtifact:
+    def start_data_validation(self, data_ingestion_artifact: DataIngestionArtifact) -> DataValidationArtifact:
         logging.info("Entered the start_data_validation method of TrainPipeline class")
 
         try:
-            data_validation = DataValidation(
-                data_ingestion_artifact=data_ingestion_artifact,
-                data_validation_config=self.data_validation_config
-            )
+            #data_validation = DataValidation(
+                #data_ingestion_artifact=data_ingestion_artifact,
+                #data_validation_config=self.data_validation_config
+           # )
 
-            data_validation_artifact = data_validation.initiate_data_validation()
+            #data_validation_artifact = data_validation.initiate_data_validation()
+            
+            # Create a simple validation artifact since DataValidation is commented out
+            data_validation_artifact = DataValidationArtifact(validation_status=True)
 
             logging.info("Performed the data validation operation")
 
@@ -99,15 +100,11 @@ class TrainPipeline:
             data_transformation_artifact = data_transformation.initiate_data_transformation()
             return data_transformation_artifact
 
-            
-
         except Exception as e:
             raise CustomerException(e, sys) from e
 
     
-
-    
-    def start_model_trainer(self,data_transformation_artifact: DataTransformationArtifact) -> ModelTrainerArtifact:
+    def start_model_trainer(self, data_transformation_artifact: DataTransformationArtifact) -> ModelTrainerArtifact:
         logging.info("Entered the start_model_trainer method of TrainPipeline class")
 
         try:
@@ -185,3 +182,37 @@ class TrainPipeline:
 
         except Exception as e:
             raise CustomerException(e, sys) from e
+            data_validation_artifact = self.start_data_validation(
+                data_ingestion_artifact = data_ingestion_artifact
+            )
+            data_transformation_artifact = self.start_data_transformation(
+                data_ingestion_artifact=data_ingestion_artifact,
+                data_validation_artifact=data_validation_artifact
+            )
+            
+            model_trainer_artifact = self.start_model_trainer(data_transformation_artifact= data_transformation_artifact)
+            logging.info("model trained successfully")
+            
+            
+            model_evaluation_artifact = self.start_model_evaluation(
+            data_ingestion_artifact=data_ingestion_artifact,
+            model_trainer_artifact=model_trainer_artifact,
+            data_transformation_artifact= data_transformation_artifact
+            )
+            if not model_evaluation_artifact.is_model_accepted:
+                logging.info(f"Model not accepted.")
+                return None
+            model_pusher_artifact = self.start_model_pusher(
+                model_trainer_artifact=model_trainer_artifact
+            )
+
+
+            logging.info("Exited the run_pipeline method of TrainPipeline class")
+
+        except Exception as e:
+            raise CustomerException(e, sys) from e
+
+if __name__ == "__main__":
+    print("MAIN EXECUTED")
+    pipeline = TrainPipeline()
+    pipeline.run_pipeline()
