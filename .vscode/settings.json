@@ -13,6 +13,19 @@
         "git push": true,
         "git checkout": true,
         "git reset": true,
-        "git rm": true
+        "git rm": true,
+        "gh": true,
+        "/^cd \"C:\\\\Users\\\\kunal sarkar\\\\Downloads\\\\Customer-Categorizer-main\\\\Customer-Categorizer-main\" ; python -m src\\.pipeline\\.train_pipeline 2>&1 \\| head -100$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd \"C:\\\\Users\\\\kunal sarkar\\\\Downloads\\\\Customer-Categorizer-main\\\\Customer-Categorizer-main\" ; python -c \"import src\\.pipeline\\.train_pipeline\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd \"C:\\\\Users\\\\kunal sarkar\\\\Downloads\\\\Customer-Categorizer-main\\\\Customer-Categorizer-main\" ; python -c \"import src\\.pipeline\\.train_pipeline; print\\('✓ File syntax is correct!'\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }
