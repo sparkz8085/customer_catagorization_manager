@@ -1,92 +1,124 @@
-from fastapi import FastAPI, Request
-from typing import Optional
+import os
+from pathlib import Path
+from typing import List
+
+from fastapi import FastAPI, Header, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import JSONResponse, Response
 from uvicorn import run as app_run
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field, ValidationError
 
 
 from src.pipeline.prediction_pipeline import PredictionPipeline
-from src.pipeline.train_pipeline import TrainPipeline
 from src.constant.application import *
 
 import warnings
-warnings.filterwarnings('ignore')
 
-app = FastAPI()
+warnings.filterwarnings("ignore")
 
-
-templates = Jinja2Templates(directory='templates')
+BASE_DIR = Path(__file__).resolve().parent
 
 
-origins = ["*"]
+def get_allowed_origins() -> List[str]:
+    origins = os.getenv("CORS_ORIGINS", "")
+    return [origin.strip() for origin in origins.split(",") if origin.strip()]
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
+app = FastAPI(title="Customer Categorizer", docs_url=None, redoc_url=None)
+
+
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+
+
+origins = get_allowed_origins()
+
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_credentials=bool(origins),
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 
-class DataForm:
-    def __init__(self, request: Request):
-        self.request: Request = request
-        self.Age : Optional[str] = None
-        self.Education  : Optional[str] = None
-        self.Marital_Status  : Optional[str] = None
-        self.Parental_Status : Optional[str] = None
-        self.Children  : Optional[str] = None
-        self.Income  : Optional[str] = None
-        self.Total_Spending  : Optional[str] = None
-        self.Days_as_Customer  : Optional[str] = None
-        self.Recency  : Optional[str] = None
-        self.Wines  : Optional[str] = None
-        self.Fruits  : Optional[str] = None
-        self.Meat : Optional[str] = None
-        self.Fish   : Optional[str] = None
-        self.Sweets : Optional[str] = None
-        self.Gold  : Optional[str] = None
-        self.Web  : Optional[str] = None
-        self.Catalog  : Optional[str] = None
-        self.Store  : Optional[str] = None
-        self.Discount_Purchases  : Optional[str] = None
-        self.Total_Promo  : Optional[str] = None
-        self.NumWebVisitsMonth  : Optional[str] = None
-        
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "img-src 'self' data:; "
+        "style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
+        "script-src 'self' https://code.jquery.com; "
+        "form-action 'self'; "
+        "frame-ancestors 'none'"
+    )
+    return response
 
-    async def get_customer_data(self):
-        form =  await self.request.form()
-        self.Age = form.get('Age')
-        self.Education = form.get('Education')
-        self.Marital_Status = form.get('Marital_Status')
-        self.Parental_Status = form.get('Parental_Status')
-        self.Children = form.get('Children')
-        self.Income = form.get('Income')
-        self.Total_Spending = form.get('Total_Spending')
-        self.Days_as_Customer = form.get('Days_as_Customer')
-        self.Recency = form.get('Recency')
-        self.Wines = form.get('Wines')
-        self.Fruits = form.get('Fruits')
-        self.Meat = form.get('Meat')
-        self.Fish = form.get('Fish')
-        self.Sweets = form.get('Sweets')
-        self.Gold = form.get('Gold')
-        self.Web = form.get('Web')
-        self.Catalog = form.get('Catalog')
-        self.Store = form.get('Store')
-        self.Discount_Purchases = form.get('Discount_Purchases')
-        self.Total_Promo = form.get('Total_Promo')
-        self.NumWebVisitsMonth = form.get('NumWebVisitsMonth')
+
+class CustomerInput(BaseModel):
+    Age: int = Field(ge=0, le=120)
+    Education: int = Field(ge=0, le=4)
+    Marital_Status: int = Field(ge=0, le=1)
+    Parental_Status: int = Field(ge=0, le=1)
+    Children: int = Field(ge=0, le=20)
+    Income: float = Field(ge=0)
+    Total_Spending: float = Field(ge=0)
+    Days_as_Customer: int = Field(ge=0)
+    Recency: int = Field(ge=0)
+    Wines: int = Field(ge=0)
+    Fruits: int = Field(ge=0)
+    Meat: int = Field(ge=0)
+    Fish: float = Field(ge=0)
+    Sweets: int = Field(ge=0)
+    Gold: float = Field(ge=0)
+    Web: int = Field(ge=0)
+    Catalog: int = Field(ge=0)
+    Store: int = Field(ge=0)
+    Discount_Purchases: int = Field(ge=0)
+    Total_Promo: int = Field(ge=0)
+    NumWebVisitsMonth: int = Field(ge=0)
+
+    def as_prediction_values(self) -> List[object]:
+        data = self.model_dump() if hasattr(self, "model_dump") else self.dict()
+        fields = getattr(CustomerInput, "model_fields", CustomerInput.__fields__)
+        return [data[field] for field in fields]
+
+
+async def parse_customer_input(request: Request) -> CustomerInput:
+    form = await request.form()
+    fields = getattr(CustomerInput, "model_fields", CustomerInput.__fields__)
+    payload = {field: form.get(field) for field in fields}
+    return CustomerInput(**payload)
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}
+
 
 @app.get("/train")
-async def trainRouteClient():
+async def trainRouteClient(x_training_api_key: str = Header(default="")):
+    expected_key = os.getenv("TRAINING_API_KEY")
+    if not expected_key:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Training is disabled in this environment.",
+        )
+    if x_training_api_key != expected_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
     try:
+        from src.pipeline.train_pipeline import TrainPipeline
+
         train_pipeline = TrainPipeline()
 
         train_pipeline.run_pipeline()
@@ -94,7 +126,10 @@ async def trainRouteClient():
         return Response("Training successful !!")
 
     except Exception as e:
-        return Response(f"Error Occurred! {e}")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"status": False, "error": "Training failed."},
+        )
 
 
 @app.get("/")
@@ -102,56 +137,52 @@ async def predictGetRouteClient(request: Request):
     try:
 
         return templates.TemplateResponse(
+            request,
             "customer.html",
-            {"request": request, "context": "Rendering"},
+            {"context": None, "error": None},
         )
 
     except Exception as e:
-        return Response(f"Error Occurred! {e}")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"status": False, "error": "Unable to render page."},
+        )
 
 @app.post("/")
 async def predictRouteClient(request: Request):
     try:
-        form = DataForm(request)
-        
-        await form.get_customer_data()
-        
-        input_data = [form.Age, 
-                    form.Education, 
-                    form.Marital_Status, 
-                    form.Parental_Status, 
-                    form.Children, 
-                    form.Income, 
-                    form.Total_Spending, 
-                    form.Days_as_Customer, 
-                    form.Recency, 
-                    form.Wines, 
-                    form.Fruits, 
-                    form.Meat, 
-                    form.Fish, 
-                    form.Sweets, 
-                    form.Gold, 
-                    form.Web, 
-                    form.Catalog, 
-                    form.Store, 
-                    form.Discount_Purchases, 
-                    form.Total_Promo, 
-                    form.NumWebVisitsMonth]
+        customer_input = await parse_customer_input(request)
+        input_data = customer_input.as_prediction_values()
         
         prediction_pipeline = PredictionPipeline()
         predicted_cluster = prediction_pipeline.run_pipeline(input_data=input_data)
-       
-        
-        # model_predictor = Customer_segmentation_Classifier()
 
-        # predicted_cluster = model_predictor.predict(customer_data_df)
         return templates.TemplateResponse(
+            request,
             "customer.html",
-            {"request": request, "context": int(predicted_cluster[0])}
+            {"context": int(predicted_cluster[0]), "error": None},
         )
 
+    except ValidationError:
+        return templates.TemplateResponse(
+            request,
+            "customer.html",
+            {
+                "context": None,
+                "error": "Please enter valid non-negative customer values.",
+            },
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
     except Exception as e:
-        return {"status": False, "error": f"{e}"}
+        return templates.TemplateResponse(
+            request,
+            "customer.html",
+            {
+                "context": None,
+                "error": "Prediction failed. Check model storage and environment configuration.",
+            },
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
 
 if __name__ == "__main__":

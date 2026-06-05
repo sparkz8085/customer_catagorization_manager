@@ -20,15 +20,44 @@ Dataset used
 
 1. Python
 2. FastAPI
-3. Machine learning algorithms
-4. Docker
+3. Jinja2 templates
+4. Machine learning algorithms
 5. MongoDB
+6. AWS S3
+7. Vercel serverless functions
 
 ## Infrastructure required
 
 1. AWS S3
-2. Azure
-3. Github Actions
+2. MongoDB Atlas
+3. Vercel
+4. Github Actions
+
+## Production deployment on Vercel
+
+This repository is configured as a single Vercel project. The FastAPI app serves both the HTML frontend and backend routes through `api/index.py`.
+
+Required Vercel environment variables:
+
+```bash
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+MONGO_DB_URL=
+CORS_ORIGINS=
+TRAINING_API_KEY=
+```
+
+`CORS_ORIGINS` can be left empty for same-origin Vercel hosting. Set it to a comma-separated list only when another domain must call the API.
+
+`TRAINING_API_KEY` is optional. If it is not set, `/train` is disabled. Model training is a long-running, database and S3 write-heavy workflow, so keep it disabled for public production traffic unless you intentionally run it behind a private admin flow.
+
+Local checks:
+
+```bash
+python -m compileall app.py api src tests
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
 
 ## How to run
 
@@ -77,7 +106,7 @@ export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
 export AWS_DEFAULT_REGION=<AWS_DEFAULT_REGION>
 
 
-export MONGODB_URL= <MONGODB_URL>
+export MONGO_DB_URL=<MONGO_DB_URL>
 
 
 ```
@@ -94,7 +123,7 @@ Step 6. Train application
 
 ```bash
 
-http://localhost:5000/train
+curl -H "x-training-api-key: <TRAINING_API_KEY>" http://localhost:5000/train
 
 ```
 
@@ -102,7 +131,7 @@ Step 7. Prediction application
 
 ```bash
 
-http://localhost:5000/predict
+http://localhost:5000/
 
 ```
 
@@ -163,5 +192,3 @@ From these above models after hyperparameter optimization we selected these two 
 ## Conclusion
 
 - This Project can be used in real-life by Users.
-
-

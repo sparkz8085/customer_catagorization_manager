@@ -1,4 +1,15 @@
+from pathlib import Path
+
 from setuptools import find_packages, setup
+
+
+def read_requirements():
+    requirements_path = Path(__file__).with_name("requirements.txt")
+    return [
+        line.strip()
+        for line in requirements_path.read_text().splitlines()
+        if line.strip() and not line.startswith("#")
+    ]
 
 setup(
     name="src",
@@ -6,28 +17,5 @@ setup(
     author="iNeuron",
     author_email="cloud@ineuron.ai",
     packages=find_packages(),
-    install_requires=[
-        "boto3==1.24.84",
-        "botocore-stubs==1.27.86",
-        "dill==0.3.5.1",
-        "dnspython==2.2.1",
-        "evidently==0.1.58.dev0",
-        "fastapi==0.78.0",
-        "from-root==1.0.2",
-        "httptools==0.5.0",
-        "imblearn==0.0",
-        "mypy-boto3-s3==1.24.76",
-        "pip-chill==1.0.1",
-        "pymongo==4.2.0",
-        "jinja2",
-        "python-dotenv==0.21.0",
-        "types-s3transfer==0.6.0.post4",
-        "uvicorn==0.18.3",
-        "watchfiles==0.17.0",
-        "websockets==10.3",
-        "wincertstore==0.2",
-        "xgboost==1.6.2",
-        "python-multipart",
-        "neuro_mf",
-    ],
+    install_requires=read_requirements(),
 )
