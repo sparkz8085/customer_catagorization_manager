@@ -5,11 +5,12 @@ import os,sys
 from src.logger import logging
 from src.exception import CustomerException
 from botocore.exceptions import ClientError
-from pandas import DataFrame,read_csv
+from pandas import DataFrame, read_csv
 import pickle
 
 
 class SimpleStorageService:
+
 
     def __init__(self):
         s3_client = S3Client()
@@ -53,8 +54,11 @@ class SimpleStorageService:
             logging.info("Exited the read_object method of S3Operations class")
             return conv_func()
 
+        except CustomerException:
+            raise
         except Exception as e:
             raise CustomerException(e, sys) from e
+
 
     def get_bucket(self, bucket_name: str) -> Any:
         """
@@ -126,9 +130,25 @@ class SimpleStorageService:
             model_file = func()
             file_object = self.get_file_object(model_file, bucket_name)
             model_obj = self.read_object(file_object, decode=False)
+
+            # SECURITY: Loading arbitrary pickle data can lead to RCE.
+            # Backward compatibility: existing models are pickled.
+            # To keep prediction working while preventing silent RCE,
+            # only allow unpickling when explicitly trusted.
+            #
+            # Enable by setting env var MODEL_TRUSTED=1 (recommended for your own buckets only).
+            # On Vercel/CI without this, we refuse to load pickled models.
+            model_trusted = os.getenv("MODEL_TRUSTED", "") in {"1", "true", "TRUE", "yes", "YES"}
+            if not model_trusted:
+                raise CustomerException(
+                    f"Refusing to unpickle model from s3 without trust. Set MODEL_TRUSTED=1 to allow.",
+                    sys,
+                )
+
             model = pickle.loads(model_obj)
             logging.info("Exited the load_model method of S3Operations class")
             return model
+
 
         except Exception as e:
             raise CustomerException(e, sys) from e
