@@ -173,17 +173,17 @@ async def predictRouteClient(request: Request):
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
+
     except Exception as e:
         return templates.TemplateResponse(
             request,
             "customer.html",
             {
                 "context": None,
-                "error": "Prediction failed. Check model storage and environment configuration.",
+                "error": f"ERROR: {str(e)}",
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
 
 if __name__ == "__main__":
     app_run(app, host = APP_HOST, port =APP_PORT)
