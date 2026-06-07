@@ -15,4 +15,4 @@ python-multipart==0.0.32
 PyYAML==6.0.2
 scikit-learn==1.5.2
 uvicorn[standard]==0.34.0
-#xgboost==2.1.3
+
