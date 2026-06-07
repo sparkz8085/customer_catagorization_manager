@@ -1,11 +1,22 @@
 import logging
 import os
+from pathlib import Path
 
-from from_root import from_root
+from src.constant.training_pipeline import (
+    ARTIFACT_DIR,
+    LOG_DIR,
+    LOG_FILE,
+    PIPELINE_NAME,
+)
 
-from src.constant.training_pipeline import ARTIFACT_DIR, LOG_DIR, LOG_FILE, PIPELINE_NAME
+BASE_DIR = Path(__file__).resolve().parents[2]
 
-logs_path = os.path.join(from_root(), PIPELINE_NAME, ARTIFACT_DIR, LOG_DIR)
+logs_path = os.path.join(
+    str(BASE_DIR),
+    PIPELINE_NAME,
+    ARTIFACT_DIR,
+    LOG_DIR
+)
 
 os.makedirs(logs_path, exist_ok=True)
 
