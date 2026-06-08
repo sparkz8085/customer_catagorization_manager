@@ -206,11 +206,12 @@ class MainUtils:
         logging.info("Entered the load_object method of MainUtils class")
 
         try:
+            from src.cloud_storage.local_storage import SafeUnpickler
+            import io
             with open(file_path, "rb") as file_obj:
-                obj = pickle.load(file_obj)
+                obj = SafeUnpickler(file_obj).load()
 
             logging.info("Exited the load_object method of MainUtils class")
-
             return obj
 
         except Exception as e:

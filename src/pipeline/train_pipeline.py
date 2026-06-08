@@ -135,12 +135,11 @@ class TrainPipeline:
         except Exception as e:
             raise CustomerException(e, sys)
 
-    def start_model_pusher(self, model_trainer_artifact: ModelTrainerArtifact):
-        """
-        """
+    def start_model_pusher(self, model_trainer_artifact: ModelTrainerArtifact, data_transformation_artifact: DataTransformationArtifact):
         try:
             model_pusher = ModelPusher(
                 model_trainer_artifact=model_trainer_artifact,
+                data_transformation_artifact=data_transformation_artifact,
                 model_pusher_config=self.model_pusher_config,
             )
             model_pusher_artifact = model_pusher.initiate_model_pusher()
@@ -174,36 +173,8 @@ class TrainPipeline:
                 logging.info(f"Model not accepted.")
                 return None
             model_pusher_artifact = self.start_model_pusher(
-                model_trainer_artifact=model_trainer_artifact
-            )
-
-
-            logging.info("Exited the run_pipeline method of TrainPipeline class")
-
-        except Exception as e:
-            raise CustomerException(e, sys) from e
-            data_validation_artifact = self.start_data_validation(
-                data_ingestion_artifact = data_ingestion_artifact
-            )
-            data_transformation_artifact = self.start_data_transformation(
-                data_ingestion_artifact=data_ingestion_artifact,
-                data_validation_artifact=data_validation_artifact
-            )
-            
-            model_trainer_artifact = self.start_model_trainer(data_transformation_artifact= data_transformation_artifact)
-            logging.info("model trained successfully")
-            
-            
-            model_evaluation_artifact = self.start_model_evaluation(
-            data_ingestion_artifact=data_ingestion_artifact,
-            model_trainer_artifact=model_trainer_artifact,
-            data_transformation_artifact= data_transformation_artifact
-            )
-            if not model_evaluation_artifact.is_model_accepted:
-                logging.info(f"Model not accepted.")
-                return None
-            model_pusher_artifact = self.start_model_pusher(
-                model_trainer_artifact=model_trainer_artifact
+                model_trainer_artifact=model_trainer_artifact,
+                data_transformation_artifact=data_transformation_artifact
             )
 
 

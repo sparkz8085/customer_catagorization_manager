@@ -175,12 +175,14 @@ async def predictRouteClient(request: Request):
         )
 
     except Exception as e:
+        import logging as app_logging
+        app_logging.exception("Prediction failed with error:")
         return templates.TemplateResponse(
             request,
             "customer.html",
             {
                 "context": None,
-                "error": f"ERROR: {str(e)}",
+                "error": "Prediction failed. Check model storage and environment configuration.",
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

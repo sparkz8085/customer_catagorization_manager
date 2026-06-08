@@ -1,43 +1,58 @@
+import os
 import sys
+import shutil
 
-from src.cloud_storage.aws_storage import SimpleStorageService
 from src.entity.artifact_entity import (ModelPusherArtifact,
-                                           ModelTrainerArtifact)
+                                           ModelTrainerArtifact,
+                                           DataTransformationArtifact)
 from src.entity.config_entity import ModelPusherConfig
 from src.exception import CustomerException
 from src.logger import logging
-from src.ml.model.s3_estimator import CustomerClusterEstimator
+from src.ml.model.local_estimator import CustomerClusterEstimator
 
 
 class ModelPusher:
     def __init__(
         self,
         model_trainer_artifact: ModelTrainerArtifact,
+        data_transformation_artifact: DataTransformationArtifact,
         model_pusher_config: ModelPusherConfig,
     ):
-        self.s3 = SimpleStorageService()
         self.model_trainer_artifact = model_trainer_artifact
+        self.data_transformation_artifact = data_transformation_artifact
         self.model_pusher_config = model_pusher_config
         self.src_estimator = CustomerClusterEstimator(
-            bucket_name=model_pusher_config.bucket_name,
-            model_path=model_pusher_config.s3_model_key_path,
+            model_dir=model_pusher_config.model_dir,
+            model_file_name=model_pusher_config.model_file_name,
         )
 
     def initiate_model_pusher(self) -> ModelPusherArtifact:
-        logging.info("Entered initiate_model_pusher method of ModelTrainer class")
+        logging.info("Entered initiate_model_pusher method of ModelPusher class")
 
         try:
-            logging.info("Uploading artifacts folder to s3 bucket")
+            logging.info("Saving model to local disk")
             self.src_estimator.save_model(
-                from_file=self.model_trainer_artifact.trained_model_file_path
+                from_file=self.model_trainer_artifact.trained_model_file_path,
+                remove=False
             )
+            
+            logging.info("Saving preprocessor object to local disk")
+            preprocessor_dest_path = os.path.join(
+                self.model_pusher_config.preprocessor_dir,
+                self.model_pusher_config.preprocessor_file_name
+            )
+            os.makedirs(os.path.dirname(preprocessor_dest_path), exist_ok=True)
+            shutil.copy(
+                self.data_transformation_artifact.transformed_object_file_path,
+                preprocessor_dest_path
+            )
+            
             model_pusher_artifact = ModelPusherArtifact(
-                bucket_name=self.model_pusher_config.bucket_name,
-                s3_model_path=self.model_pusher_config.s3_model_key_path,
+                saved_model_path=self.src_estimator.model_path,
             )
-            logging.info("Uploaded artifacts folder to s3 bucket")
+            logging.info("Saved artifacts to local disk successfully")
             logging.info(f"Model pusher artifact: [{model_pusher_artifact}]")
-            logging.info("Exited initiate_model_pusher method of ModelTrainer class")
+            logging.info("Exited initiate_model_pusher method of ModelPusher class")
             return model_pusher_artifact
         except Exception as e:
             raise CustomerException(e, sys) from e

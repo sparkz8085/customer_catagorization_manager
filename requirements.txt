@@ -1,4 +1,3 @@
-boto3==1.34.162
 certifi==2024.8.30
 dill==0.3.8
 dnspython==2.6.1

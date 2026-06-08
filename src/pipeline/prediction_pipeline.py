@@ -1,4 +1,4 @@
-from src.ml.model.s3_estimator import CustomerClusterEstimator
+from src.ml.model.local_estimator import CustomerClusterEstimator
 from src.logger import logging
 from src.entity.config_entity import DataTransformationConfig , ModelTrainerConfig
 from src.constant.training_pipeline import *
@@ -10,9 +10,6 @@ import pandas as pd
 import numpy as np
 import sys
 from pandas import DataFrame
-
-
-
 
 
 class CustomerData:
@@ -43,7 +40,6 @@ class CustomerData:
         return input_dataset
         
         
-    
 
 
 class PredictionPipeline:
@@ -97,8 +93,8 @@ class PredictionPipeline:
         try:
             prediction_config = PredictionPipelineConfig()
             model = CustomerClusterEstimator(
-                bucket_name= prediction_config.model_bucket_name,
-                model_path= prediction_config.model_file_name
+                model_dir=prediction_config.model_dir,
+                model_file_name=prediction_config.model_file_name
             )
                 
             return model
@@ -129,8 +125,5 @@ class PredictionPipeline:
         
             
         
-
  
-        
-
         

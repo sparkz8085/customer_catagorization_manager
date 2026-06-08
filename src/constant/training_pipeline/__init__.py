@@ -1,6 +1,6 @@
 # pipeline name and root directory constant
 import os
-from src.constant.s3_bucket import TRAINING_BUCKET_NAME
+
 
 
 TARGET_COLUMN = "cluster"
@@ -58,5 +58,6 @@ MODEL Evauation related constant start with MODEL_EVALUATION var name
 """
 
 MODEL_EVALUATION_CHANGED_THRESHOLD_SCORE: float = 0.02
-MODEL_PUSHER_BUCKET_NAME = TRAINING_BUCKET_NAME
+SAVED_MODEL_DIR = "saved_models"
+
 

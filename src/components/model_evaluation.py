@@ -10,7 +10,7 @@ import sys
 import pandas as pd
 
 
-from src.ml.model.s3_estimator import CustomerClusterEstimator
+from src.ml.model.local_estimator import CustomerClusterEstimator
 from dataclasses import dataclass
 from typing import Optional
 from src.entity.config_entity import Prediction_config
@@ -52,12 +52,14 @@ class ModelEvaluation:
 
     def get_best_model(self) -> Optional[CustomerClusterEstimator]:
         try:
-            bucket_name = self.model_eval_config.bucket_name
-            model_path = self.model_eval_config.s3_model_key_path
-            customer_cluster_estimator = CustomerClusterEstimator(bucket_name=bucket_name,
-                                               model_path=model_path)
+            model_dir = self.model_eval_config.model_dir
+            model_file_name = self.model_eval_config.model_file_name
+            customer_cluster_estimator = CustomerClusterEstimator(
+                model_dir=model_dir,
+                model_file_name=model_file_name
+            )
 
-            if customer_cluster_estimator.is_model_present(model_path=model_path):
+            if customer_cluster_estimator.is_model_present():
                 return customer_cluster_estimator
             return None
         except Exception as e:
