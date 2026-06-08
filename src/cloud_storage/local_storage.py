@@ -44,7 +44,10 @@ class SafeUnpickler(pickle.Unpickler):
 
 class LocalStorageService:
     def __init__(self):
-        pass
+        os.makedirs(os.path.join("artifacts", "models"), exist_ok=True)
+        os.makedirs(os.path.join("artifacts", "preprocessor"), exist_ok=True)
+        os.makedirs(os.path.join("artifacts", "data"), exist_ok=True)
+        os.makedirs(os.path.join("artifacts", "uploads"), exist_ok=True)
 
     def file_exists(self, filepath: str) -> bool:
         try:
