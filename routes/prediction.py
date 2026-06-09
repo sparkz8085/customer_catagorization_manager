@@ -62,17 +62,24 @@ async def predictGetRouteClient(request: Request):
             content={"status": False, "error": "Unable to render page."},
         )
 
+CLUSTER_MAPPING = {
+    0: "Budget-Conscious Families",
+    1: "Deal-Hunting Loyalists",
+    2: "Affluent VIP Customers"
+}
+
 @router.post("/")
 async def predictRouteClient(request: Request):
     try:
         customer_input = await parse_customer_input(request)
         input_data = customer_input.as_prediction_values()
         predicted_cluster = predict_customer(input_data)
+        cluster_name = CLUSTER_MAPPING.get(predicted_cluster, str(predicted_cluster))
 
         return templates.TemplateResponse(
             request,
             "customer.html",
-            {"context": predicted_cluster, "error": None},
+            {"context": cluster_name, "error": None},
         )
 
     except ValidationError:
