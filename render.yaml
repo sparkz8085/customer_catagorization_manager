@@ -11,3 +11,6 @@ services:
         value: "1"
       - key: TRAINING_API_KEY
         value: testkey
+      - key: PYTHON_VERSION
+        value: 3.11.8
+

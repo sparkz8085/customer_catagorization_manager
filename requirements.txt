@@ -14,3 +14,4 @@ python-multipart==0.0.32
 PyYAML==6.0.2
 scikit-learn==1.5.2
 uvicorn==0.34.0
+neuro-mf==0.0.5

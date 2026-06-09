@@ -42,6 +42,7 @@ def test_safe_unpickler_allowed():
 def test_safe_unpickler_blocked():
     import io
     import pickle
+    # pyrefly: ignore [missing-import]
     import pytest
     from src.cloud_storage.local_storage import SafeUnpickler
     

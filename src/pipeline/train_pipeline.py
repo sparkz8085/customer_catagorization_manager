@@ -69,7 +69,14 @@ class TrainPipeline:
             #data_validation_artifact = data_validation.initiate_data_validation()
             
             # Create a simple validation artifact since DataValidation is commented out
-            data_validation_artifact = DataValidationArtifact(validation_status=True)
+            data_validation_artifact = DataValidationArtifact(
+                validation_status=True,
+                valid_train_file_path="",
+                valid_test_file_path="",
+                invalid_train_file_path="",
+                invalid_test_file_path="",
+                drift_report_file_path=""
+            )
 
             logging.info("Performed the data validation operation")
 
@@ -94,7 +101,7 @@ class TrainPipeline:
             data_transformation = DataTransformation(
                 data_ingestion_artifact=data_ingestion_artifact,
                 data_validation_artifact=data_validation_artifact,
-                data_tranasformation_config=self.data_transformation_config
+                data_transformation_config=self.data_transformation_config
             )
             
             data_transformation_artifact = data_transformation.initiate_data_transformation()

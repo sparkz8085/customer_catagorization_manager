@@ -16,6 +16,7 @@ class SafeUnpickler(pickle.Unpickler):
         "sklearn.preprocessing",
         "xgboost",
         "src.ml.model.estimator",
+        "src.components.model_trainer",
         "copyreg",
     }
     
@@ -30,6 +31,7 @@ class SafeUnpickler(pickle.Unpickler):
         "bool",
         "bytes",
         "object",
+        "slice",
     }
 
     def find_class(self, module, name):
