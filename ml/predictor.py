@@ -6,13 +6,24 @@ from config import MODEL_PATH, PREPROCESSOR_PATH, MODEL_FEATURES, OUTLIER_FEATUR
 def predict_customer(input_values: list) -> int:
     """
     Loads preprocessor and model, shapes the inputs, preprocesses them, and runs model prediction.
+    First tries loading from the main artifacts paths, falls back to ml/ model paths if unavailable.
     """
-    if not os.path.exists(MODEL_PATH) or not os.path.exists(PREPROCESSOR_PATH):
-        raise FileNotFoundError("Trained model or preprocessor artifacts not found. Please run training first.")
-        
-    with open(MODEL_PATH, "rb") as f:
+    model_path = MODEL_PATH
+    preprocessor_path = PREPROCESSOR_PATH
+    
+    # Check fallback paths
+    if not os.path.exists(model_path) or not os.path.exists(preprocessor_path):
+        fallback_model = os.path.join("ml", "model.pkl")
+        fallback_preprocessor = os.path.join("ml", "preprocessor.pkl")
+        if os.path.exists(fallback_model) and os.path.exists(fallback_preprocessor):
+            model_path = fallback_model
+            preprocessor_path = fallback_preprocessor
+        else:
+            raise FileNotFoundError("Trained model or preprocessor artifacts not found. Please run training first.")
+            
+    with open(model_path, "rb") as f:
         model = pickle.load(f)
-    with open(PREPROCESSOR_PATH, "rb") as f:
+    with open(preprocessor_path, "rb") as f:
         preprocessor = pickle.load(f)
         
     # Shape input list into a DataFrame with MODEL_FEATURES columns

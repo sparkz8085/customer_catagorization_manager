@@ -10,8 +10,8 @@ ARTIFACTS_DIR = "artifacts"
 MODEL_FILE_NAME = "model.pkl"
 PREPROCESSOR_FILE_NAME = "preprocessor.pkl"
 
-MODEL_PATH = os.path.join(ARTIFACTS_DIR, MODEL_FILE_NAME)
-PREPROCESSOR_PATH = os.path.join(ARTIFACTS_DIR, PREPROCESSOR_FILE_NAME)
+MODEL_PATH = os.path.join(ARTIFACTS_DIR, "models", MODEL_FILE_NAME)
+PREPROCESSOR_PATH = os.path.join(ARTIFACTS_DIR, "preprocessor", PREPROCESSOR_FILE_NAME)
 
 # Data Schema configurations
 DROP_COLUMNS = ["ID", "Z_CostContact", "Z_Revenue"]

@@ -136,11 +136,19 @@ def train_model():
     print(f"[TRAIN] Best model cross-validation score: {grid_search.best_score_:.4f}")
     
     # 6. Save model and preprocessor to artifacts
-    os.makedirs(ARTIFACTS_DIR, exist_ok=True)
+    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    os.makedirs(os.path.dirname(PREPROCESSOR_PATH), exist_ok=True)
     
     with open(MODEL_PATH, "wb") as f:
         pickle.dump(best_model, f)
     with open(PREPROCESSOR_PATH, "wb") as f:
+        pickle.dump(preprocessor, f)
+        
+    # Copy/Save them to ml/ directory as backup
+    os.makedirs("ml", exist_ok=True)
+    with open(os.path.join("ml", "model.pkl"), "wb") as f:
+        pickle.dump(best_model, f)
+    with open(os.path.join("ml", "preprocessor.pkl"), "wb") as f:
         pickle.dump(preprocessor, f)
         
     print(f"[SUCCESS] Saved model to: {MODEL_PATH}")
