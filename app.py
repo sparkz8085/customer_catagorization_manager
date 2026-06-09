@@ -10,32 +10,23 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ValidationError
 
-
-from src.pipeline.prediction_pipeline import PredictionPipeline
-from src.constant.application import *
+from config import APP_HOST, APP_PORT
 
 import warnings
-
 warnings.filterwarnings("ignore")
 
 BASE_DIR = Path(__file__).resolve().parent
-
 
 def get_allowed_origins() -> List[str]:
     origins = os.getenv("CORS_ORIGINS", "")
     return [origin.strip() for origin in origins.split(",") if origin.strip()]
 
-
 app = FastAPI(title="Customer Categorizer", docs_url=None, redoc_url=None)
 
-
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
-
-
 origins = get_allowed_origins()
 
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -44,7 +35,6 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Authorization"],
 )
-
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
@@ -62,7 +52,6 @@ async def add_security_headers(request: Request, call_next):
         "frame-ancestors 'none'"
     )
     return response
-
 
 class CustomerInput(BaseModel):
     Age: int = Field(ge=0, le=120)
@@ -89,21 +78,24 @@ class CustomerInput(BaseModel):
 
     def as_prediction_values(self) -> List[object]:
         data = self.model_dump() if hasattr(self, "model_dump") else self.dict()
-        fields = getattr(CustomerInput, "model_fields", CustomerInput.__fields__)
+        fields = ["Age", "Education", "Marital_Status", "Parental_Status", "Children", "Income",
+                  "Total_Spending", "Days_as_Customer", "Recency", "Wines", "Fruits", "Meat",
+                  "Fish", "Sweets", "Gold", "Web", "Catalog", "Store", "Discount_Purchases",
+                  "Total_Promo", "NumWebVisitsMonth"]
         return [data[field] for field in fields]
-
 
 async def parse_customer_input(request: Request) -> CustomerInput:
     form = await request.form()
-    fields = getattr(CustomerInput, "model_fields", CustomerInput.__fields__)
+    fields = ["Age", "Education", "Marital_Status", "Parental_Status", "Children", "Income",
+              "Total_Spending", "Days_as_Customer", "Recency", "Wines", "Fruits", "Meat",
+              "Fish", "Sweets", "Gold", "Web", "Catalog", "Store", "Discount_Purchases",
+              "Total_Promo", "NumWebVisitsMonth"]
     payload = {field: form.get(field) for field in fields}
     return CustomerInput(**payload)
-
 
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
-
 
 @app.get("/train")
 async def trainRouteClient(x_training_api_key: str = Header(default="")):
@@ -117,31 +109,25 @@ async def trainRouteClient(x_training_api_key: str = Header(default="")):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
     try:
-        from src.pipeline.train_pipeline import TrainPipeline
-
-        train_pipeline = TrainPipeline()
-
-        train_pipeline.run_pipeline()
-
+        from services.training import train_model
+        train_model()
         return Response("Training successful !!")
-
     except Exception as e:
+        import logging as app_logging
+        app_logging.exception("Training failed:")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"status": False, "error": "Training failed."},
+            content={"status": False, "error": f"Training failed: {str(e)}"},
         )
-
 
 @app.get("/")
 async def predictGetRouteClient(request: Request):
     try:
-
         return templates.TemplateResponse(
             request,
             "customer.html",
             {"context": None, "error": None},
         )
-
     except Exception as e:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -154,13 +140,13 @@ async def predictRouteClient(request: Request):
         customer_input = await parse_customer_input(request)
         input_data = customer_input.as_prediction_values()
         
-        prediction_pipeline = PredictionPipeline()
-        predicted_cluster = prediction_pipeline.run_pipeline(input_data=input_data)
+        from services.prediction import predict_customer
+        predicted_cluster = predict_customer(input_data)
 
         return templates.TemplateResponse(
             request,
             "customer.html",
-            {"context": int(predicted_cluster[0]), "error": None},
+            {"context": predicted_cluster, "error": None},
         )
 
     except ValidationError:
@@ -188,5 +174,4 @@ async def predictRouteClient(request: Request):
         )
 
 if __name__ == "__main__":
-    app_run(app, host = APP_HOST, port =APP_PORT)
-    
+    app_run(app, host=APP_HOST, port=APP_PORT)
