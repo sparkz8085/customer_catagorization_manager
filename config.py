@@ -38,7 +38,7 @@ OUTLIER_FEATURES = ["Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold", "Age", 
 EXPECTED_ACCURACY = 0.6
 SPLIT_RATIO = 0.2
 PCA_COMPONENTS = 2
-KMEANS_CLUSTERS = 3
+KMEANS_CLUSTERS = 4
 GRID_SEARCH_PARAM_GRID = {
     'C': [1000],
     'max_iter': [113],

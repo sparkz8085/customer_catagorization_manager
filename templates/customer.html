@@ -3,152 +3,351 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Customer Segmentation</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css')}}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9Oer+R4R+cz6jR8AJf6xBTa9EkRtQnFQ781MmTk6mdxj3" crossorigin="anonymous">
+    <title>Customer Segmentation & Analysis Dashboard</title>
+    <!-- Fonts & Bootstrap -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
   </head>
   <body>
-    <nav class="navbar navbar-light bg-light static-top">
-        <div class="container-fluid">
-           <a class="navbar-brand" href="https://ineuron.ai"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIkAAAAlCAMAAABBJDpuAAAAVFBMVEX/fgD/iQA7NzIyMjMnNYInNYEnNYInNYEzMzInNYQnNYETJzsnNYIwN1wxMjNoTis4O1YrNm0xOF47PE9DP0dEQEVpTVkAJJ4nNYEOLJHJbiAzMzOmmmHRAAAAFnRSTlOh/vu+986oen9fP2UqEzQkFAIDAAEEILVBJQAAA3FJREFUWMPNmO2WoyAMQG0VBARtdVRs3/89NwkgaF1rd2aOm18tIrnkgwSz7n+R7LcV1ELkeS7E7VySRlyfQXJhTiO55c+liP4cEuH1X8E7gaV+S3Jv2zYZ/Vr+/Sdx2vP6doc/fSPcf/GOpLSFVXFUW8t+giRP47TOd60yk1hbxIhSP0ACKPWrvw7YBIT/lcQY84G3Wk17ugWQfg5UsQJpjflKSLQi7xTWyk0SXTJ4VnB5D1yccxmp4Z+mX5KGNS+SPXVNll0ulyxL0wYmloBB6zL/MpCoAgjAJiUM6w0SboMwPUdRogvNKcNM3smFdRvEcJJkKcflQa+X0pNIfBGW0zKqjyQtw4VLKQlI7ZLgdrRNSZDjMQx2GB4pCkxkCrfGWUTJ0Egan6muCHgJCUwtnCk0mrJ9Q8K5LUqtdSfynkAedhynaRqngVDaXLiJEAzkFkM71IuIlWRYtSQpbXSZDvQ7JPCei9brs+oaABkn74LRIkpFaVxGnzjvIxTYREOoEwn5r01JTDRTcO87Eu3zNUeTPKZpjrIRrNIDCjzALbPk7LJMIokOEQu2K7yKQAKvFDF9pVe0R+LGb7h1MMkw2ijjA/1zhSfSphvEAChXJEhAqwYStIJWXnTpvbdH4hTUwSQ2JRmQpILDLYbB7J41SYiLcNozu5Z3JMo7RxBJahI7WSRByCMkqJt9hySESbVJcvmARJGFExJmdBSl2oM2+T4JLWfgaGFptizlPUm1FydHSdyZ7UnS4ySph2kS0kJrkvr5NJg7dnrJnfxgxPozRPGtkyPNOxtaiDvbIAF9L+5B5zTI2BwlwXmM+U3zReav3o0F8oUEFFZ42McDZYomOUziFmezgWyo251Uc1nyKJol7URCEvIYUEbHYaEGQi9C9egwCdVfHwiaajfjKMUcHcRacCylhWJbJDfq47EEDhYqoIWjHnwDXZPpPiChPQelLU+Cbm4w50FmYgkvFwpiWwCC/Um/SLcNElOC9RVj6qWpCiEMvRUK4zLpdKmPw8rVldy/qxjn60wLrVLWJIPLiZJRr3fsvnOHPvare+lB93tb37T20D82jqOt+zNuXhuNvNhp7X+PpHb3rvV9R5xjE2SpyCN9ffQO+GtWIZr5Xnytz4gTMIRYfys47/uJEXny/aQ/95tSUwmU+uRvSp/IHzQqZYpYrQmxAAAAAElFTkSuQmCC" /></a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom py-3">
+      <div class="container-fluid px-4">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+          <img src="data:image/png;base64,iVBORw0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA0KGgoAAA563dFfwtU=" class="me-2" alt="iNeuron" onerror="this.style.display='none'"/>
+          <span class="fw-extrabold text-primary fs-4">Customer Segmentor</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-fluid px-4 py-4">
+      {% if error %}
+      <div class="alert alert-danger rounded-custom shadow-sm mb-4" role="alert">
+        <h5 class="alert-heading fw-bold">Prediction Error</h5>
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <div class="row g-4">
+        <!-- Input Form Column -->
+        <div class="col-lg-{% if context is not none %}5{% else %}8 mx-auto{% endif %}">
+          <div class="card shadow-sm border-0 p-4 bg-white rounded-custom">
+            <h3 class="fw-bold mb-4 text-dark text-center">Customer Characteristics</h3>
+            
+            <form action="/" method="post">
+              
+              <!-- SECTION 1: DEMOGRAPHICS & BACKGROUND -->
+              <div class="form-section-title">Demographics & Background</div>
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label for="Age" class="form-label font-semibold">Age</label>
+                  <input type="number" class="form-control" id="Age" name="Age" placeholder="e.g. 35" required value="{{ user_data.Age if user_data else '' }}">
+                </div>
+                <div class="col-md-6">
+                  <label for="Income" class="form-label">Annual Income ($)</label>
+                  <input type="number" class="form-control" id="Income" name="Income" placeholder="e.g. 55000" required value="{{ user_data.Income if user_data else '' }}">
+                </div>
+                <div class="col-md-6">
+                  <label for="Education" class="form-label">Education Level</label>
+                  <select class="form-select" id="Education" name="Education" required>
+                    <option value="" disabled {% if not user_data %}selected{% endif %}>Select Education</option>
+                    <option value="0" {% if user_data and user_data.Education == 0 %}selected{% endif %}>Basic</option>
+                    <option value="1" {% if user_data and user_data.Education == 1 %}selected{% endif %}>2n Cycle</option>
+                    <option value="2" {% if user_data and user_data.Education == 2 %}selected{% endif %}>Graduation</option>
+                    <option value="3" {% if user_data and user_data.Education == 3 %}selected{% endif %}>Master</option>
+                    <option value="4" {% if user_data and user_data.Education == 4 %}selected{% endif %}>PhD</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="Marital_Status" class="form-label">Married / Cohabiting</label>
+                  <select class="form-select" id="Marital_Status" name="Marital_Status" required>
+                    <option value="" disabled {% if not user_data %}selected{% endif %}>Select Status</option>
+                    <option value="0" {% if user_data and user_data.Marital_Status == 0 %}selected{% endif %}>N (Single/Divorced/Alone)</option>
+                    <option value="1" {% if user_data and user_data.Marital_Status == 1 %}selected{% endif %}>Y (Married/Together)</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="Parental_Status" class="form-label">Has Kids / Teens</label>
+                  <select class="form-select" id="Parental_Status" name="Parental_Status" required>
+                    <option value="" disabled {% if not user_data %}selected{% endif %}>Select Status</option>
+                    <option value="0" {% if user_data and user_data.Parental_Status == 0 %}selected{% endif %}>N</option>
+                    <option value="1" {% if user_data and user_data.Parental_Status == 1 %}selected{% endif %}>Y</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="Children" class="form-label">Total Children</label>
+                  <input type="number" class="form-control" id="Children" name="Children" placeholder="e.g. 1" required value="{{ user_data.Children if user_data else '' }}">
+                </div>
+                <div class="col-md-6">
+                  <label for="Days_as_Customer" class="form-label">Days as Customer</label>
+                  <input type="number" class="form-control" id="Days_as_Customer" name="Days_as_Customer" placeholder="e.g. 500" required value="{{ user_data.Days_as_Customer if user_data else '' }}">
+                </div>
+                <div class="col-md-6">
+                  <label for="Recency" class="form-label">Days Since Last Purchase</label>
+                  <input type="number" class="form-control" id="Recency" name="Recency" placeholder="e.g. 15" required value="{{ user_data.Recency if user_data else '' }}">
+                </div>
+              </div>
+
+              <!-- SECTION 2: PRODUCT SPENDINGS -->
+              <div class="form-section-title">2-Year Product Spendings ($)</div>
+              <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                  <label for="Wines" class="form-label">Wines</label>
+                  <input type="number" class="form-control" id="Wines" name="Wines" placeholder="e.g. 150" required value="{{ user_data.Wines if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Fruits" class="form-label">Fruits</label>
+                  <input type="number" class="form-control" id="Fruits" name="Fruits" placeholder="e.g. 20" required value="{{ user_data.Fruits if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Meat" class="form-label">Meat</label>
+                  <input type="number" class="form-control" id="Meat" name="Meat" placeholder="e.g. 80" required value="{{ user_data.Meat if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Fish" class="form-label">Fish</label>
+                  <input type="number" step="0.01" class="form-control" id="Fish" name="Fish" placeholder="e.g. 30.5" required value="{{ user_data.Fish if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Sweets" class="form-label">Sweets</label>
+                  <input type="number" class="form-control" id="Sweets" name="Sweets" placeholder="e.g. 15" required value="{{ user_data.Sweets if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Gold" class="form-label">Gold</label>
+                  <input type="number" step="0.01" class="form-control" id="Gold" name="Gold" placeholder="e.g. 25" required value="{{ user_data.Gold if user_data else '' }}">
+                </div>
+                <div class="col-12">
+                  <label for="Total_Spending" class="form-label fw-semibold">Combined Total Spending ($)</label>
+                  <input type="number" class="form-control" id="Total_Spending" name="Total_Spending" placeholder="Sum of all categories above" required value="{{ user_data.Total_Spending if user_data else '' }}">
+                </div>
+              </div>
+
+              <!-- SECTION 3: CHANNELS & PROMOTIONS -->
+              <div class="form-section-title">Purchase Channels & Promos</div>
+              <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                  <label for="Web" class="form-label">Web Purchases</label>
+                  <input type="number" class="form-control" id="Web" name="Web" placeholder="e.g. 4" required value="{{ user_data.Web if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Catalog" class="form-label">Catalog Purchases</label>
+                  <input type="number" class="form-control" id="Catalog" name="Catalog" placeholder="e.g. 2" required value="{{ user_data.Catalog if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Store" class="form-label">Store Purchases</label>
+                  <input type="number" class="form-control" id="Store" name="Store" placeholder="e.g. 5" required value="{{ user_data.Store if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Discount_Purchases" class="form-label">Deals with Discount</label>
+                  <input type="number" class="form-control" id="Discount_Purchases" name="Discount_Purchases" placeholder="e.g. 2" required value="{{ user_data.Discount_Purchases if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Total_Promo" class="form-label">Accepted Promos</label>
+                  <input type="number" class="form-control" id="Total_Promo" name="Total_Promo" placeholder="e.g. 0" required value="{{ user_data.Total_Promo if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="NumWebVisitsMonth" class="form-label">Monthly Web Visits</label>
+                  <input type="number" class="form-control" id="NumWebVisitsMonth" name="NumWebVisitsMonth" placeholder="e.g. 6" required value="{{ user_data.NumWebVisitsMonth if user_data else '' }}">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-predict w-100 mt-2">Predict Customer Cluster</button>
+            </form>
+          </div>
         </div>
-     </nav>
-    <section>
-        <div class="container-fluid">
-            <div class="container">
-                <form action="/" method="post">
-                    <legend>Customer Segmentation</legend>
-                    {% if error %}
-                    <div class="alert alert-danger" role="alert">{{ error }}</div>
-                    {% endif %}
-                    <div class="mb-3">
-                        <label for="Age">Age</label>
-                        <input type="number" class="form-control" id="Age" name="Age"  placeholder="Customer Age" required="required">
-                      </div>
-        
-                      <div class="mb-3">
-                        <label for="Education">Education of customer</label>
-                        <select class="form-control" id="Education" name="Education" placeholder="Education of Customer" required="required">
-                            <option value="" disabled selected>Select Education</option>
-                            <option value="0">Basic</option>
-                            <option value="1">2n Cycle</option>
-                            <option value = "2">Graduation</option>
-                            <option value = "3">Master</option>
-                            <option value = "4">PhD</option>
-                        </select>
-                      </div>
-        
-                      <div class="mb-3">
-                        <label for="Marital_Status">Married</label>
-                        <select class="form-control" id="Marital_Status" name="Marital_Status" placeholder="Is married" required="required">
-                            <option value="" disabled selected>Is married</option>
-                            <option value="0">N</option>
-                            <option value = "1">Y</option>
-                        </select>
-                      </div>
-        
-                      <div class="mb-3">
-                        <label for="Parental_Status">Has Kids</label>
-                        <select class="form-control" id="Parental_Status" name="Parental_Status" placeholder="Parental_Status" required="required">
-                            <option value="" disabled selected>Has kids</option>
-                            <option value = "0">N</option>
-                            <option value = "1">Y</option>
-                        </select>
-                      </div>
-        
-                      <div class="mb-3">
-                        <label for="Children">Number of Children</label>
-                        <input type="number" class="form-control" id="Children" name="Children"  placeholder="No of Children" required = "required">
-                      </div>
-                      
-                      <div class="mb-3">
-                        <label for="Income">Income of customer</label>
-                            <input type="number" class="form-control" id="Income" name="Income"  placeholder="Customer income" required="required">
-                          </div>
-        
-                      <div class="mb-3">
-                        <label for="Total_Spending">Total money Spending </label>
-                        <input type="number" class="form-control" id="Total_Spending" name="Total_Spending"  placeholder="Total money spending" required="required">
-                      </div>
 
-                      <div class="mb-3">
-                        <label for="Days_as_Customer">Days of being customer</label>
-                        <input type="number" class="form-control" id="Days_as_Customer" name="Days_as_Customer"  placeholder="Days of being customer" required="required">
-                      </div>
-                      
-                      <div class="mb-3">
-                        <label for="Recency">Number of days since customer's last purchase</label>
-                        <input type="number" class="form-control" id="Recency" name="Recency"  placeholder="Number of days since customer's last purchase" required="required">
-                      </div>
+        <!-- Visualizations Column -->
+        {% if context is not none %}
+        <div class="col-lg-7">
+          <!-- Prediction Result Banner -->
+          {% set bg_class = 'card-gradient-vip' %}
+          {% if context == 'Budget' %}
+            {% set bg_class = 'card-gradient-budget' %}
+          {% elif context == 'Regular' %}
+            {% set bg_class = 'card-gradient-loyalist' %}
+          {% elif context == 'Occasional' %}
+            {% set bg_class = 'card-gradient-vip' %}
+          {% elif context == 'Premium' %}
+            {% set bg_class = 'card-gradient-vip' %}
+          {% endif %}
+          
+          <div class="card {{ bg_class }} border-0 shadow-sm rounded-custom p-4 mb-4 text-center">
+            <span class="text-uppercase tracking-wider opacity-75 font-semibold" style="font-size: 0.85rem; letter-spacing: 2px;">Assigned Category</span>
+            <h1 class="display-5 fw-extrabold my-2 text-white" style="margin-bottom:0px !important;">{{ context }}</h1>
+            <p class="mb-0 opacity-90">Customer is in Cluster: {{ context }}. Based on values submitted, this customer matches the benchmark profile.</p>
+          </div>
 
-                      
-
-                      <div class="mb-3">
-                        <label for="'Wines'">Amount spent on wine in last 2 years</label>
-                        <input type="number" class="form-control" id="Wines" name="Wines"  placeholder="Amount spent on wine in last 2 years" required="required">
-                      </div>
-
-                      <div class="mb-3">
-                        <label for="Fruits">Amount spent on Fruits in last 2 years</label>
-                        <input type="number" class="form-control" id="Fruits" name="Fruits"  placeholder="Amount spent on Fruits in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Meat">Amount spent on Meat in last 2 years</label>
-                        <input type="number" class="form-control" id="Meat" name="Meat"  placeholder="Amount spent on Meat in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Fish">Amount spent on Fish in last 2 years</label>
-                        <input type="number" step="0.01" class="form-control" id="Fish" name="Fish"  placeholder="Amount spent on Fish in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Sweets">Amount spent on Sweets in last 2 years</label>
-                        <input type="number" class="form-control" id="Sweets" name="Sweets"  placeholder="Amount spent on Sweets in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Gold">Amount spent on Gold in last 2 years</label>
-                        <input type="number" class="form-control" id="Gold" name="Gold"  placeholder="Amount spent on Gold in last 2 years" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Web">Number of purchases made through the company’s website </label>
-                        <input type="number" class="form-control" id="Web" name="Web"  placeholder="Number of purchases made through the company’s website " required="required">
-                      </div>
-
-                      <div class="mb-3">
-                        <label for="Catalog"> Number of purchases made using a catalogue
-                        </label>
-                        <input type="number" class="form-control" id="Catalog" name="Catalog"  placeholder="Number of purchases made using a catalogue " required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Store">Number of purchases made directly in stores </label>
-                        <input type="number" class="form-control" id="Store" name="Store"  placeholder="Number of purchases made directly in stores " required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Discount_Purchases">Number of purchases made with a discount</label>
-                        <input type="number" class="form-control" id="Discount_Purchases" name="Discount_Purchases"  placeholder="Number of purchases made with a discount" required="required">
-                      </div>
-                      <div class="mb-3">
-                        <label for="Total_Promo">Number of promotion offers customer has accepted</label>
-                        <input type="number" class="form-control" id="Total_Promo" name="Total_Promo"  placeholder="Number of promotion offers customer has accepted" required="required">
-                      </div>
-                      
-
-                      <div class="mb-3">
-                        <label for="NumWebVisitsMonth">Number of visits to company’s website in the last month</label>
-                        <input type="number" class="form-control" id="NumWebVisitsMonth" name="NumWebVisitsMonth"  placeholder="Number of visits to company’s website in the last month" required="required">
-                      </div>
-                      
-        
-                        <input class="btn btn-primary" type="submit" value="Predict Customer Cluster" required />
-                    </div>
-                    
-                </form>
+          <!-- ApexCharts Dashboard Grid -->
+          <div class="row">
+            <!-- Customer Profile Radar Card -->
+            <div class="col-12">
+              <div class="chart-card">
+                <div id="customerProfileRadarChart"></div>
+              </div>
             </div>
-            {% if context is not none %}
-            <div class="text-center text-black">
-                <h2 class="display-4 fw-bolder">Customer is in Cluster : {{context}} </h2>
+            
+            <!-- Where This Customer Sits Card -->
+            <div class="col-12">
+              <div class="chart-card">
+                <div id="whereCustomerSitsChart"></div>
+              </div>
             </div>
-            {% endif %}
+          </div>
         </div>
-    </section>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ApexCharts JS Rendering -->
+    {% if context is not none and user_data is not none and cluster_averages is not none %}
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const predictedCluster = "{{ context }}";
+        
+        // Dynamic input data from python context
+        const userData = {
+          Income: {{ user_data.Income or 0 }},
+          Total_Spending: {{ user_data.Total_Spending or 0 }},
+          Wines: {{ user_data.Wines or 0 }},
+          Fruits: {{ user_data.Fruits or 0 }},
+          Meat: {{ user_data.Meat or 0 }},
+          Fish: {{ user_data.Fish or 0 }},
+          Sweets: {{ user_data.Sweets or 0 }},
+          Gold: {{ user_data.Gold or 0 }},
+          Web: {{ user_data.Web or 0 }},
+          Catalog: {{ user_data.Catalog or 0 }},
+          Store: {{ user_data.Store or 0 }},
+          Days_as_Customer: {{ user_data.Days_as_Customer or 0 }},
+          Discount_Purchases: {{ user_data.Discount_Purchases or 0 }}
+        };
+
+        const totalPurchases = userData.Web + userData.Catalog + userData.Store;
+
+        // Normalization formulas to project the user's data values cleanly onto a 0-100 radar chart
+        const normalizedUserData = [
+          Math.min(100, Math.round((userData.Income / 120000) * 100)),
+          Math.min(100, Math.round((userData.Total_Spending / 2000) * 100)),
+          Math.min(100, Math.round((totalPurchases / 25) * 100)),
+          Math.min(100, Math.round((userData.Days_as_Customer > 2000 ? userData.Days_as_Customer / 5000 : userData.Days_as_Customer / 1000) * 100)),
+          Math.min(100, Math.round((userData.Discount_Purchases / 8) * 100))
+        ];
+
+        // 1. Customer Profile Radar Chart
+        const radarOptions = {
+          chart: {
+            height: 350,
+            type: 'radar',
+            toolbar: { show: false },
+            dropShadow: { enabled: true, blur: 2, left: 1, top: 1 }
+          },
+          colors: ['#4e4bc0'],
+          series: [
+            {
+              name: 'Customer Profile Score',
+              data: normalizedUserData
+            }
+          ],
+          title: {
+            text: 'Customer Profile Radar',
+            align: 'left',
+            style: { fontSize: '15px', fontWeight: 'bold', fontFamily: 'Plus Jakarta Sans', color: '#1e293b' }
+          },
+          stroke: { width: 2 },
+          fill: { opacity: 0.15 },
+          markers: { size: 4 },
+          xaxis: {
+            categories: ['Income', 'Spending', 'Frequency', 'Loyalty', 'Discount'],
+            labels: {
+              style: {
+                colors: ['#64748b', '#64748b', '#64748b', '#64748b', '#64748b'],
+                fontSize: '11px',
+                fontFamily: 'Plus Jakarta Sans'
+              }
+            }
+          },
+          yaxis: {
+            show: false,
+            min: 0,
+            max: 100
+          },
+          legend: {
+            show: false
+          }
+        };
+        const radarChart = new ApexCharts(document.querySelector("#customerProfileRadarChart"), radarOptions);
+        radarChart.render();
+
+        // 2. Where This Customer Sits Donut Chart
+        // Series matches calculated cluster frequencies: Budget (~36.0%), Occasional (~20.8%), Premium (~23.3%), Regular (~20.0%)
+        // Colors from reference image: Budget (Blue-Gray), Occasional (Beige), Premium (Purple), Regular (Teal-Green)
+        const donutOptions = {
+          chart: {
+            height: 350,
+            type: 'donut',
+            toolbar: { show: false }
+          },
+          series: [23.3, 20.8, 36.0, 20.0],
+          labels: ['Premium', 'Occasional', 'Budget', 'Regular'],
+          colors: ['#4e4bc0', '#f3dcb8', '#a4c2df', '#a2ded0'],
+          title: {
+            text: 'Where This Customer Sits',
+            align: 'left',
+            style: { fontSize: '15px', fontWeight: 'bold', fontFamily: 'Plus Jakarta Sans', color: '#1e293b' }
+          },
+          plotOptions: {
+            pie: {
+              donut: {
+                size: '70%',
+                labels: {
+                  show: true,
+                  name: {
+                    show: true,
+                    fontSize: '13px',
+                    fontFamily: 'Plus Jakarta Sans',
+                    color: '#64748b',
+                    offsetY: -10
+                  },
+                  value: {
+                    show: true,
+                    fontSize: '20px',
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: 'bold',
+                    color: '#1e293b',
+                    offsetY: 4,
+                    formatter: function (val) {
+                      return val + "%";
+                    }
+                  },
+                  total: {
+                    show: true,
+                    label: 'YOUR SEGMENT',
+                    color: '#64748b',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    formatter: function () {
+                      return predictedCluster.toUpperCase();
+                    }
+                  }
+                }
+              }
+            }
+          },
+          dataLabels: {
+            enabled: false
+          },
+          legend: {
+            position: 'bottom',
+            fontFamily: 'Plus Jakarta Sans',
+            markers: {
+              radius: 12
+            }
+          }
+        };
+        const donutChart = new ApexCharts(document.querySelector("#whereCustomerSitsChart"), donutOptions);
+        donutChart.render();
+      });
+    </script>
+    {% endif %}
   </body>
 </html>

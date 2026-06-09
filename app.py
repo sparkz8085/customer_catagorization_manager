@@ -43,8 +43,9 @@ async def add_security_headers(request: Request, call_next):
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
         "img-src 'self' data:; "
-        "style-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
-        "script-src 'self' https://code.jquery.com; "
+        "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com 'unsafe-inline'; "
+        "font-src 'self' https://fonts.gstatic.com; "
+        "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
         "form-action 'self'; "
         "frame-ancestors 'none'"
     )

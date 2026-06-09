@@ -1,82 +1,79 @@
-.navbar-light .navbar-brand {
-    color: rgba(0, 0, 0, .9);
-}
-
-.navbar-light .navbar-brand {
-    margin-left: auto;
-    margin-right: auto;
-}
+/* Customer Segmentation Dashboard Styles */
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #f4f6f9;
+  color: #1e293b;
 }
 
-.formBox {
-    margin-top: 50px;
-    padding: 50px;
+.card-gradient-budget {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
 }
 
-h1 {
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    margin-bottom: 50px !important;
-    text-transform: uppercase;
-    font-size: 48px;
+.card-gradient-loyalist {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
 }
 
-.inputBox {
-    position: relative;
-    box-sizing: border-box;
-    margin-bottom: 40px;
+.card-gradient-vip {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
 }
 
-.button {
-    width: 100%;
-    background: #00bcd4;
-    color: #fff;
-    border-radius: 0;
-    border: none;
-    outline: none;
-    height: 50px;
-    font-size: 24px;
+.rounded-custom {
+  border-radius: 16px !important;
 }
 
-.input {
-    position: relative;
-    width: 100%;
-    height: 50px;
-    background: transparent;
-    border: none;
-    outline: none;
-    font-size: 24px;
-    border-bottom: 2px solid rgba(0, 0, 0, .5);
+.form-section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #64748b;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-bottom: 16px;
 }
 
-.inputText {
-    position: absolute;
-    line-height: 50px;
-    font-size: 24px;
-    transition: .5s;
-    opacity: 0.5;
+.form-control, .form-select {
+  border-radius: 8px;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+  transition: all 0.2s;
 }
 
-.focus .inputText {
-    transform: translateY(-30px);
-    font-size: 18px;
-    opacity: 1;
-    color: #00bcd4;
+.form-control:focus, .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
-.btn_train {
-    width: 100%;
-    background: red;
-    color: #fff;
-    border-radius: 0;
-    border: none;
-    outline: none;
-    height: 50px;
-    font-size: 24px;
+.btn-predict {
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+  padding: 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-predict:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.chart-card {
+  background: white;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.navbar-brand img {
+  height: 35px;
 }

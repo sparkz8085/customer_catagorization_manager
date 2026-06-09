@@ -53,7 +53,7 @@ async def predictGetRouteClient(request: Request):
         return templates.TemplateResponse(
             request,
             "customer.html",
-            {"context": None, "error": None},
+            {"context": None, "user_data": None, "cluster_averages": None, "error": None},
         )
     except Exception as e:
         from fastapi.responses import JSONResponse
@@ -63,9 +63,73 @@ async def predictGetRouteClient(request: Request):
         )
 
 CLUSTER_MAPPING = {
-    0: "Budget-Conscious Families",
-    1: "Deal-Hunting Loyalists",
-    2: "Affluent VIP Customers"
+    0: "Budget",
+    1: "Regular",
+    2: "Premium",
+    3: "Occasional"
+}
+
+CLUSTER_AVERAGES = {
+    "Budget": {
+        "Income": 32516.73,
+        "Total_Spending": 59.57,
+        "Wines": 22.62,
+        "Fruits": 3.59,
+        "Meat": 13.55,
+        "Fish": 4.97,
+        "Sweets": 3.75,
+        "Gold": 11.09,
+        "Web": 1.65,
+        "Catalog": 0.34,
+        "Store": 2.90,
+        "Days_as_Customer": 4659.86,
+        "Discount_Purchases": 1.73
+    },
+    "Regular": {
+        "Income": 64326.89,
+        "Total_Spending": 988.53,
+        "Wines": 561.17,
+        "Fruits": 41.34,
+        "Meat": 215.33,
+        "Fish": 53.69,
+        "Sweets": 44.02,
+        "Gold": 72.98,
+        "Web": 6.68,
+        "Catalog": 4.26,
+        "Store": 8.72,
+        "Days_as_Customer": 4790.19,
+        "Discount_Purchases": 3.53
+    },
+    "Premium": {
+        "Income": 76506.42,
+        "Total_Spending": 1348.39,
+        "Wines": 592.21,
+        "Fruits": 64.34,
+        "Meat": 455.79,
+        "Fish": 95.90,
+        "Sweets": 65.19,
+        "Gold": 74.96,
+        "Web": 4.86,
+        "Catalog": 5.85,
+        "Store": 8.26,
+        "Days_as_Customer": 4699.26,
+        "Discount_Purchases": 1.03
+    },
+    "Occasional": {
+        "Income": 47458.73,
+        "Total_Spending": 353.82,
+        "Wines": 221.88,
+        "Fruits": 8.65,
+        "Meat": 63.04,
+        "Fish": 13.08,
+        "Sweets": 8.50,
+        "Gold": 38.68,
+        "Web": 4.94,
+        "Catalog": 1.58,
+        "Store": 5.22,
+        "Days_as_Customer": 4763.66,
+        "Discount_Purchases": 3.65
+    }
 }
 
 @router.post("/")
@@ -75,11 +139,18 @@ async def predictRouteClient(request: Request):
         input_data = customer_input.as_prediction_values()
         predicted_cluster = predict_customer(input_data)
         cluster_name = CLUSTER_MAPPING.get(predicted_cluster, str(predicted_cluster))
+        
+        user_data = customer_input.model_dump() if hasattr(customer_input, "model_dump") else customer_input.dict()
 
         return templates.TemplateResponse(
             request,
             "customer.html",
-            {"context": cluster_name, "error": None},
+            {
+                "context": cluster_name,
+                "user_data": user_data,
+                "cluster_averages": CLUSTER_AVERAGES,
+                "error": None
+            },
         )
 
     except ValidationError:
@@ -88,6 +159,8 @@ async def predictRouteClient(request: Request):
             "customer.html",
             {
                 "context": None,
+                "user_data": None,
+                "cluster_averages": None,
                 "error": "Please enter valid non-negative customer values.",
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -101,6 +174,8 @@ async def predictRouteClient(request: Request):
             "customer.html",
             {
                 "context": None,
+                "user_data": None,
+                "cluster_averages": None,
                 "error": "Prediction failed. Check model storage and environment configuration.",
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
