@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from config import APP_HOST, APP_PORT
 from routes.prediction import router as prediction_router
 from routes.training import router as training_router
+from routes.auth import router as auth_router
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -42,7 +43,7 @@ async def add_security_headers(request: Request, call_next):
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "img-src 'self' data:; "
+        "img-src 'self' data: https://lh3.googleusercontent.com https://graph.facebook.com https://platform-lookaside.fbsbx.com https://images.unsplash.com https://api.dicebear.com; "
         "style-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com 'unsafe-inline'; "
         "font-src 'self' https://fonts.gstatic.com; "
         "script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline'; "
@@ -52,6 +53,7 @@ async def add_security_headers(request: Request, call_next):
     return response
 
 # Register routers
+app.include_router(auth_router)
 app.include_router(prediction_router)
 app.include_router(training_router)
 

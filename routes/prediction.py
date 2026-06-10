@@ -1,8 +1,10 @@
 from typing import List
 from fastapi import APIRouter, Request, status
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, ValidationError
 from ml.predictor import predict_customer
+from services.auth_session import verify_session_cookie
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -49,11 +51,16 @@ async def parse_customer_input(request: Request) -> CustomerInput:
 
 @router.get("/")
 async def predictGetRouteClient(request: Request):
+    session_cookie = request.cookies.get("session")
+    user = verify_session_cookie(session_cookie)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+        
     try:
         return templates.TemplateResponse(
             request,
             "customer.html",
-            {"context": None, "user_data": None, "cluster_averages": None, "error": None},
+            {"context": None, "user_data": None, "cluster_averages": None, "error": None, "user": user},
         )
     except Exception as e:
         from fastapi.responses import JSONResponse
@@ -134,6 +141,11 @@ CLUSTER_AVERAGES = {
 
 @router.post("/")
 async def predictRouteClient(request: Request):
+    session_cookie = request.cookies.get("session")
+    user = verify_session_cookie(session_cookie)
+    if not user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+
     try:
         customer_input = await parse_customer_input(request)
         input_data = customer_input.as_prediction_values()
@@ -149,7 +161,8 @@ async def predictRouteClient(request: Request):
                 "context": cluster_name,
                 "user_data": user_data,
                 "cluster_averages": CLUSTER_AVERAGES,
-                "error": None
+                "error": None,
+                "user": user
             },
         )
 
@@ -162,6 +175,7 @@ async def predictRouteClient(request: Request):
                 "user_data": None,
                 "cluster_averages": None,
                 "error": "Please enter valid non-negative customer values.",
+                "user": user
             },
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
@@ -177,6 +191,7 @@ async def predictRouteClient(request: Request):
                 "user_data": None,
                 "cluster_averages": None,
                 "error": "Prediction failed. Check model storage and environment configuration.",
+                "user": user
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

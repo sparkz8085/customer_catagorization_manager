@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app import app
+from services.auth_session import create_session_cookie
 
 client = TestClient(app)
 
@@ -8,8 +9,29 @@ def test_health_check():
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
+def test_login_page_loads():
+    response = client.get("/login")
+    assert response.status_code == 200
+    assert "Sign in with Google" in response.text
+    assert "Sign in with Facebook" in response.text
+
+def test_unauthenticated_redirect():
+    response = client.get("/", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/login"
+
 def test_home_page_has_security_headers():
-    response = client.get("/")
+    mock_user = {
+        "email": "test.user@example.com",
+        "name": "Test User",
+        "avatar_url": "https://lh3.googleusercontent.com/a/default-user",
+        "provider": "mock"
+    }
+    cookie_value = create_session_cookie(mock_user)
+    auth_client = TestClient(app)
+    auth_client.cookies.set("session", cookie_value)
+    
+    response = auth_client.get("/")
     assert response.status_code == 200
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["X-Frame-Options"] == "DENY"
@@ -20,7 +42,17 @@ def test_train_route_disabled_without_secret():
     assert response.status_code == 404
 
 def test_prediction_endpoint_success():
-    response = client.post("/", data={
+    mock_user = {
+        "email": "test.user@example.com",
+        "name": "Test User",
+        "avatar_url": "https://lh3.googleusercontent.com/a/default-user",
+        "provider": "mock"
+    }
+    cookie_value = create_session_cookie(mock_user)
+    auth_client = TestClient(app)
+    auth_client.cookies.set("session", cookie_value)
+
+    response = auth_client.post("/", data={
         "Age": "25",
         "Education": "2",
         "Marital_Status": "0",
@@ -43,6 +75,12 @@ def test_prediction_endpoint_success():
         "Total_Promo": "0",
         "NumWebVisitsMonth": "8"
     })
-    # Since we have pre-trained model artifacts, prediction should succeed
     assert response.status_code == 200
     assert "Customer is in Cluster" in response.text
+
+def test_mock_callback_auth():
+    response = client.get("/auth/mock-callback?provider=google", follow_redirects=False)
+    assert response.status_code == 307
+    assert response.headers["location"] == "/?welcome=true"
+    assert "session" in response.cookies
+
