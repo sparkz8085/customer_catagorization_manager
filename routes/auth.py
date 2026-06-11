@@ -44,8 +44,7 @@ async def login_page(request: Request, error: str = None, info: str = None):
 @router.get("/login/google")
 async def login_google(request: Request):
     if not GOOGLE_CLIENT_ID:
-        # Client ID is not configured. Redirect to mock callback to simulate login.
-        return RedirectResponse(url="/auth/mock-callback?provider=google")
+        return RedirectResponse(url="/login?error=Google+OAuth+is+not+configured.+Please+set+GOOGLE_CLIENT_ID+in+your+.env+file.")
         
     redirect_uri = get_redirect_uri(request, "google")
     state = secrets.token_hex(16)
@@ -64,8 +63,7 @@ async def login_google(request: Request):
 @router.get("/login/facebook")
 async def login_facebook(request: Request):
     if not FACEBOOK_CLIENT_ID:
-        # Facebook client ID is not configured. Redirect to mock callback to simulate login.
-        return RedirectResponse(url="/auth/mock-callback?provider=facebook")
+        return RedirectResponse(url="/login?error=Facebook+OAuth+is+not+configured.+Please+set+FACEBOOK_CLIENT_ID+in+your+.env+file.")
         
     redirect_uri = get_redirect_uri(request, "facebook")
     state = secrets.token_hex(16)

@@ -350,8 +350,8 @@
             
             {% if not google_configured or not facebook_configured %}
             <div class="text-center">
-              <span class="dev-mode-badge">Simulation Mode Enabled</span>
-              <p class="small text-muted mb-4">Real Client Credentials not detected in environment. Logging in will simulate successful authentication.</p>
+              <span class="dev-mode-badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);">OAuth Keys Missing</span>
+              <p class="small text-muted mb-4">Your data will remain encrypted and safe with us! To sign in with your real account, configure your OAuth credentials in the environment, or use the <strong>Sign In</strong> tab for simulated development logins.</p>
             </div>
             {% endif %}
 
