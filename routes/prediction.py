@@ -1,3 +1,4 @@
+import os
 from typing import List
 from fastapi import APIRouter, Request, status
 from fastapi.responses import RedirectResponse
@@ -7,7 +8,8 @@ from ml.predictor import predict_customer
 from services.auth_session import verify_session_cookie
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "templates"))
+templates = Jinja2Templates(directory=templates_dir)
 
 class CustomerInput(BaseModel):
     Age: int = Field(ge=0, le=120)

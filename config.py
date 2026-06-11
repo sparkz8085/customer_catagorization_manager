@@ -1,4 +1,8 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables for local development fallback
+load_dotenv()
 
 # Database Configuration
 MONGO_DB_URL_KEY = "MONGO_DB_URL"
@@ -6,7 +10,8 @@ DATABASE_NAME = "customer_db"
 COLLECTION_NAME = "marketing_records"
 
 # Model Artifact Paths
-ARTIFACTS_DIR = "artifacts"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ARTIFACTS_DIR = os.path.join(BASE_DIR, "artifacts")
 MODEL_FILE_NAME = "model.pkl"
 PREPROCESSOR_FILE_NAME = "preprocessor.pkl"
 

@@ -37,7 +37,8 @@ def test_home_page_has_security_headers():
     assert response.headers["X-Frame-Options"] == "DENY"
     assert "frame-ancestors 'none'" in response.headers["Content-Security-Policy"]
 
-def test_train_route_disabled_without_secret():
+def test_train_route_disabled_without_secret(monkeypatch):
+    monkeypatch.delenv("TRAINING_API_KEY", raising=False)
     response = client.get("/train")
     assert response.status_code == 404
 

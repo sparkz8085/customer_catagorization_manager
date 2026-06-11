@@ -4,7 +4,7 @@ import datetime
 from database.connection import get_mongodb_client
 
 # Local database file path
-LOCAL_USERS_FILE = os.path.join("database", "users.json")
+LOCAL_USERS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "users.json"))
 
 def _load_local_users() -> dict:
     """Loads users from the local JSON file fallback."""

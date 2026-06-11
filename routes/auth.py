@@ -9,7 +9,8 @@ from services.auth_session import create_session_cookie
 from database.user_store import upsert_user
 
 router = APIRouter()
-templates = Jinja2Templates(directory="templates")
+templates_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "templates"))
+templates = Jinja2Templates(directory=templates_dir)
 
 # Client keys loaded from environment
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
