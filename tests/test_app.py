@@ -85,3 +85,16 @@ def test_mock_callback_auth():
     assert response.headers["location"] == "/?welcome=true"
     assert "session" in response.cookies
 
+
+def test_custom_info_login():
+    response = client.post("/login/email", data={
+        "name": "King Arthur",
+        "nickname": "Arthur",
+        "email": "arthur@camelot.org",
+        "password": "Password123!"
+    }, follow_redirects=False)
+    assert response.status_code == 307
+    assert response.headers["location"] == "/?welcome=true"
+    assert "session" in response.cookies
+
+

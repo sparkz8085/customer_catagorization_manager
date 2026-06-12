@@ -1,24 +1,76 @@
 /* Customer Segmentation Dashboard Styles */
 
+:root {
+  --bg-color: #f4f6f9;
+  --text-color: #1e293b;
+  --card-bg: #ffffff;
+  --border-color: #e2e8f0;
+  --navbar-bg: #ffffff;
+  --navbar-border: #cbd5e1;
+  --input-bg: #ffffff;
+  --input-border: #cbd5e1;
+  --input-color: #1e293b;
+  --section-title-color: #64748b;
+  --section-title-border: #e2e8f0;
+}
+
+html.dark-theme, body.dark-theme {
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
+  --card-bg: #1e293b;
+  --border-color: #334155;
+  --navbar-bg: #1e293b;
+  --navbar-border: #334155;
+  --input-bg: #0f172a;
+  --input-border: #475569;
+  --input-color: #f8fafc;
+  --section-title-color: #94a3b8;
+  --section-title-border: #334155;
+}
+
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background: #f4f6f9;
-  color: #1e293b;
+  background: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Navbar overrides */
+.navbar {
+  background-color: var(--navbar-bg) !important;
+  border-color: var(--navbar-border) !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.user-name-text {
+  color: var(--text-color) !important;
+}
+
+/* Card custom */
+.card, .chart-card {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03) !important;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 .card-gradient-budget {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+  border: none !important;
 }
 
 .card-gradient-loyalist {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+  color: white !important;
+  border: none !important;
 }
 
 .card-gradient-vip {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+  color: white !important;
+  border: none !important;
 }
 
 .rounded-custom {
@@ -30,23 +82,27 @@ body {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #64748b;
-  border-bottom: 2px solid #e2e8f0;
+  color: var(--section-title-color);
+  border-bottom: 2px solid var(--section-title-border);
   padding-bottom: 6px;
   margin-bottom: 16px;
+  transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .form-control, .form-select {
+  background-color: var(--input-bg) !important;
+  color: var(--input-color) !important;
+  border: 1px solid var(--input-border) !important;
   border-radius: 8px;
   padding: 10px 12px;
-  border: 1px solid #cbd5e1;
   font-size: 0.95rem;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .form-control:focus, .form-select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
+  outline: none;
 }
 
 .btn-predict {
@@ -66,14 +122,278 @@ body {
 }
 
 .chart-card {
-  background: white;
-  border: none;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-  border-radius: 16px;
   padding: 20px;
   margin-bottom: 20px;
 }
 
 .navbar-brand img {
   height: 35px;
+}
+
+/* ==========================================================================
+   PREDICT CARD STYLES
+   ========================================================================== */
+
+/* 1. Medieval Style */
+.style-medieval {
+  font-family: 'Cinzel', Georgia, serif !important;
+  background-color: #f4ebd0 !important;
+  background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0), radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0) !important;
+  background-size: 8px 8px !important;
+  background-position: 0 0, 4px 4px !important;
+  border: 6px double #8c6239 !important;
+  border-radius: 12px !important;
+  color: #5c3d24 !important;
+  box-shadow: 0 10px 25px rgba(140, 98, 57, 0.15) !important;
+}
+
+.style-medieval h3, .style-medieval label {
+  color: #5c3d24 !important;
+  font-weight: 700 !important;
+}
+
+.style-medieval .form-section-title {
+  color: #8c6239 !important;
+  border-bottom: 2px solid #8c6239 !important;
+}
+
+.style-medieval .form-control, .style-medieval .form-select {
+  background-color: #FAF5E6 !important;
+  border: 1px solid #8c6239 !important;
+  color: #5c3d24 !important;
+  font-family: 'Cinzel', Georgia, serif !important;
+  border-radius: 4px !important;
+}
+
+.style-medieval .form-control:focus, .style-medieval .form-select:focus {
+  box-shadow: 0 0 0 3px rgba(140, 98, 57, 0.25) !important;
+  border-color: #5c3d24 !important;
+}
+
+.style-medieval option {
+  background-color: #FAF5E6 !important;
+  color: #5c3d24 !important;
+}
+
+.style-medieval .btn-predict {
+  background: linear-gradient(135deg, #8c6239 0%, #5c3d24 100%) !important;
+  color: #FAF5E6 !important;
+  font-family: 'Cinzel', Georgia, serif !important;
+  border: 1px solid #5c3d24 !important;
+  border-radius: 4px !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.style-medieval .btn-predict:hover {
+  background: linear-gradient(135deg, #5c3d24 0%, #3d2512 100%) !important;
+  box-shadow: 0 4px 12px rgba(92, 61, 36, 0.3);
+}
+
+/* 2. Mythic Style */
+.style-mythic {
+  font-family: 'Orbitron', sans-serif !important;
+  background: linear-gradient(135deg, #09061c 0%, #03020d 100%) !important;
+  border: 2px solid #a855f7 !important;
+  border-radius: 20px !important;
+  color: #e9d5ff !important;
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.45), inset 0 0 15px rgba(34, 211, 238, 0.15) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.style-mythic::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.style-mythic h3 {
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6) !important;
+}
+
+.style-mythic label {
+  color: #c084fc !important;
+  font-weight: 500 !important;
+}
+
+.style-mythic .form-section-title {
+  color: #22d3ee !important;
+  border-bottom: 2px dashed #a855f7 !important;
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.4) !important;
+}
+
+.style-mythic .form-control, .style-mythic .form-select {
+  background-color: rgba(9, 6, 28, 0.8) !important;
+  border: 1px solid #6b21a8 !important;
+  color: #22d3ee !important;
+  font-family: 'Orbitron', sans-serif !important;
+  border-radius: 10px !important;
+}
+
+.style-mythic .form-control:focus, .style-mythic .form-select:focus {
+  border-color: #22d3ee !important;
+  box-shadow: 0 0 10px rgba(34, 211, 238, 0.5) !important;
+}
+
+.style-mythic option {
+  background-color: #09061c !important;
+  color: #22d3ee !important;
+}
+
+.style-mythic .btn-predict {
+  background: linear-gradient(135deg, #a855f7 0%, #22d3ee 100%) !important;
+  color: #ffffff !important;
+  font-family: 'Orbitron', sans-serif !important;
+  border: none !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.4) !important;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.style-mythic .btn-predict:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 25px rgba(34, 211, 238, 0.7) !important;
+}
+
+/* 3. Elegant Style */
+.style-elegant {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  background-color: #fdfbf7 !important;
+  border: 1px solid #d4af37 !important;
+  border-radius: 4px !important;
+  color: #1e1e1e !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05) !important;
+}
+
+.style-elegant h3 {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: #1e1e1e !important;
+}
+
+.style-elegant label {
+  color: #4a4a4a !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.style-elegant .form-section-title {
+  color: #b89726 !important;
+  border-bottom: 1px solid #e5d5a2 !important;
+  font-style: italic !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  letter-spacing: 0.5px;
+}
+
+.style-elegant .form-control, .style-elegant .form-select {
+  background-color: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #cbd5e1 !important;
+  border-radius: 0 !important;
+  color: #1e1e1e !important;
+  padding: 6px 0 !important;
+  font-family: 'Playfair Display', Georgia, serif !important;
+}
+
+.style-elegant .form-control:focus, .style-elegant .form-select:focus {
+  border-bottom: 1px solid #d4af37 !important;
+  box-shadow: none !important;
+}
+
+.style-elegant option {
+  background-color: #fdfbf7 !important;
+  color: #1e1e1e !important;
+  font-family: 'Playfair Display', Georgia, serif !important;
+}
+
+.style-elegant .btn-predict {
+  background: #1e1e1e !important;
+  color: #d4af37 !important;
+  border: 1px solid #d4af37 !important;
+  border-radius: 0 !important;
+  font-family: 'Playfair Display', Georgia, serif !important;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+}
+
+.style-elegant .btn-predict:hover {
+  background: #d4af37 !important;
+  color: #1e1e1e !important;
+  box-shadow: none;
+}
+
+/* 4. Aristocrat Style */
+.style-aristocrat {
+  font-family: 'Cormorant Garamond', Georgia, serif !important;
+  background: linear-gradient(135deg, #380a13 0%, #150206 100%) !important;
+  border: 5px double #d4af37 !important;
+  border-radius: 16px !important;
+  color: #f3e5ab !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5) !important;
+}
+
+.style-aristocrat h3 {
+  color: #d4af37 !important;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.style-aristocrat label {
+  color: #f3e5ab !important;
+  font-weight: 500;
+}
+
+.style-aristocrat .form-section-title {
+  color: #d4af37 !important;
+  border-bottom: 2px solid #d4af37 !important;
+  letter-spacing: 1px;
+}
+
+.style-aristocrat .form-control, .style-aristocrat .form-select {
+  background-color: #20050a !important;
+  border: 1px solid #8e6d19 !important;
+  color: #ffffff !important;
+  font-family: 'Cormorant Garamond', Georgia, serif !important;
+  border-radius: 6px !important;
+}
+
+.style-aristocrat .form-control:focus, .style-aristocrat .form-select:focus {
+  border-color: #d4af37 !important;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.35) !important;
+}
+
+.style-aristocrat option {
+  background-color: #20050a !important;
+  color: #f3e5ab !important;
+}
+
+.style-aristocrat .btn-predict {
+  background: linear-gradient(135deg, #d4af37 0%, #a27b1e 100%) !important;
+  color: #150206 !important;
+  font-family: 'Cormorant Garamond', Georgia, serif !important;
+  font-weight: 700 !important;
+  border: 1px solid #d4af37 !important;
+  border-radius: 6px !important;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.style-aristocrat .btn-predict:hover {
+  background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 100%) !important;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
 }

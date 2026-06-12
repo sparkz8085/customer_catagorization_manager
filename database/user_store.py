@@ -57,7 +57,7 @@ def get_user_by_email(email: str) -> dict | None:
     users = _load_local_users()
     return users.get(email_lower)
 
-def upsert_user(provider: str, provider_uid: str, email: str, name: str, avatar_url: str) -> dict:
+def upsert_user(provider: str, provider_uid: str, email: str, name: str, avatar_url: str, nickname: str = None, password: str = None) -> dict:
     """
     Creates or updates a user profile.
     Saves to MongoDB, falling back to local users.json if MongoDB is unavailable.
@@ -70,6 +70,10 @@ def upsert_user(provider: str, provider_uid: str, email: str, name: str, avatar_
     existing_user = get_user_by_email(email_lower)
     created_at = existing_user.get("created_at") if existing_user else now_str
     
+    # Preserve existing nickname/password if not provided in the current call
+    final_nickname = nickname if nickname is not None else (existing_user.get("nickname") if existing_user else None)
+    final_password = password if password is not None else (existing_user.get("password") if existing_user else None)
+    
     user_data = {
         "email": email_lower,
         "name": name,
@@ -77,7 +81,9 @@ def upsert_user(provider: str, provider_uid: str, email: str, name: str, avatar_
         "provider": provider,
         "provider_uid": provider_uid,
         "created_at": created_at,
-        "last_login": now_str
+        "last_login": now_str,
+        "nickname": final_nickname,
+        "password": final_password
     }
     
     # Try MongoDB first

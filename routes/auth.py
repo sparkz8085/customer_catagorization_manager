@@ -246,7 +246,7 @@ async def mock_callback(request: Request, provider: str):
     return response
 
 @router.post("/login/email")
-async def login_email(request: Request, name: str = Form(...), email: str = Form(...)):
+async def login_email(request: Request, name: str = Form(...), email: str = Form(...), nickname: str = Form(None), password: str = Form(None)):
     """Handles standard simulated developer email logins."""
     if not email or not name:
         return RedirectResponse(url="/login?error=Email+and+Name+are+required")
@@ -258,7 +258,9 @@ async def login_email(request: Request, name: str = Form(...), email: str = Form
         provider_uid=f"mock-email-{secrets.token_hex(4)}",
         email=email,
         name=name,
-        avatar_url=avatar
+        avatar_url=avatar,
+        nickname=nickname,
+        password=password
     )
     
     session_cookie = create_session_cookie(user)

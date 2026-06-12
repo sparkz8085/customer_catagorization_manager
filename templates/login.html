@@ -303,6 +303,29 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       }
+
+      /* Animations for custom login validation */
+      .shake {
+        animation: shake-anim 0.5s ease-in-out;
+      }
+
+      @keyframes shake-anim {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+        20%, 40%, 60%, 80% { transform: translateX(8px); }
+      }
+
+      .glass-card.invalid-card {
+        border-color: rgba(239, 68, 68, 0.55) !important;
+        box-shadow: 0 0 25px rgba(239, 68, 68, 0.35), 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+      }
+
+      .glass-card.valid-card {
+        border-color: rgba(16, 185, 129, 0.55) !important;
+        box-shadow: 0 0 25px rgba(16, 185, 129, 0.35), 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.04) 0%, rgba(255, 255, 255, 0.02) 100%) !important;
+      }
     </style>
   </head>
   <body>
@@ -397,15 +420,42 @@
 
             <div class="divider">Or custom info</div>
 
-            <form action="/login/email" method="post">
+            <form action="/login/email" method="post" id="custom-auth-form">
               <div class="mb-3">
                 <label for="name" class="form-label">Full Name</label>
                 <input type="text" class="form-control" id="name" name="name" placeholder="e.g. John Doe" required>
               </div>
               <div class="mb-3">
+                <label for="nickname" class="form-label">Nick Name</label>
+                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="e.g. Johnny" required>
+              </div>
+              <div class="mb-3">
                 <label for="email" class="form-label">Email Address</label>
                 <input type="email" class="form-control" id="email" name="email" placeholder="e.g. john@example.com" required>
               </div>
+              <div class="mb-2">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+              </div>
+              
+              <!-- Realtime Password Strength Indicators -->
+              <div class="password-requirements mb-3 p-3 rounded" style="background: rgba(0,0,0,0.25); font-size: 0.8rem; border: 1px solid var(--glass-border);">
+                <div class="text-muted fw-bold mb-2" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Password must include:</div>
+                <div class="row g-2">
+                  <div class="col-6 req-len text-danger">✗ Min 8 chars</div>
+                  <div class="col-6 req-upper text-danger">✗ 1 Uppercase</div>
+                  <div class="col-6 req-lower text-danger">✗ 1 Lowercase</div>
+                  <div class="col-6 req-digit text-danger">✗ 1 Digit</div>
+                  <div class="col-6 req-special text-danger">✗ 1 Special char</div>
+                </div>
+              </div>
+
+              <!-- Frontend validation alert box -->
+              <div id="validation-errors" class="alert-custom d-none align-items-center gap-2 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <div id="validation-msg" style="font-size: 0.85rem;"></div>
+              </div>
+
               <button type="submit" class="btn btn-submit w-100">Log In</button>
             </form>
           </div>
@@ -419,5 +469,117 @@
 
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Validation JavaScript -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("custom-auth-form");
+        const card = document.querySelector(".glass-card");
+        const nameInput = document.getElementById("name");
+        const nicknameInput = document.getElementById("nickname");
+        const passwordInput = document.getElementById("password");
+        const emailInput = document.getElementById("email");
+        const errorBox = document.getElementById("validation-errors");
+        const errorMsg = document.getElementById("validation-msg");
+
+        // Requirement selectors
+        const reqLen = document.querySelector(".req-len");
+        const reqUpper = document.querySelector(".req-upper");
+        const reqLower = document.querySelector(".req-lower");
+        const reqDigit = document.querySelector(".req-digit");
+        const reqSpecial = document.querySelector(".req-special");
+
+        function updateReq(element, isValid) {
+          const baseText = element.innerText.slice(2); // Strip prefix emoji/symbol
+          if (isValid) {
+            element.classList.remove("text-danger");
+            element.classList.add("text-success");
+            element.innerHTML = "✓ " + baseText;
+          } else {
+            element.classList.remove("text-success");
+            element.classList.add("text-danger");
+            element.innerHTML = "✗ " + baseText;
+          }
+        }
+
+        function validatePassword(val) {
+          const hasLen = val.length >= 8;
+          const hasUpper = /[A-Z]/.test(val);
+          const hasLower = /[a-z]/.test(val);
+          const hasDigit = /[0-9]/.test(val);
+          const hasSpecial = /[^A-Za-z0-9]/.test(val);
+
+          updateReq(reqLen, hasLen);
+          updateReq(reqUpper, hasUpper);
+          updateReq(reqLower, hasLower);
+          updateReq(reqDigit, hasDigit);
+          updateReq(reqSpecial, hasSpecial);
+
+          return hasLen && hasUpper && hasLower && hasDigit && hasSpecial;
+        }
+
+        // Live check password typing
+        passwordInput.addEventListener("input", function() {
+          validatePassword(passwordInput.value);
+        });
+
+        // Live check email typing to reset error state when valid
+        emailInput.addEventListener("input", function() {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (emailRegex.test(emailInput.value)) {
+            card.classList.remove("invalid-card");
+          }
+        });
+
+        form.addEventListener("submit", function(e) {
+          e.preventDefault();
+
+          const email = emailInput.value;
+          const password = passwordInput.value;
+
+          // Email validation
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          const isEmailValid = emailRegex.test(email);
+
+          // Password validation
+          const isPasswordValid = validatePassword(password);
+
+          // Remove classes before re-validation
+          card.classList.remove("shake", "invalid-card", "valid-card");
+          errorBox.classList.add("d-none");
+          errorBox.classList.remove("d-flex");
+
+          if (!isEmailValid || !isPasswordValid) {
+            // Force redraw of animation
+            void card.offsetWidth;
+            
+            // Apply invalid styles & shake
+            card.classList.add("invalid-card", "shake");
+            
+            // Build error message
+            let errors = [];
+            if (!isEmailValid) errors.push("Please enter a valid email address containing '@' and a domain.");
+            if (!isPasswordValid) errors.push("Password does not meet all criteria shown below.");
+            
+            errorMsg.innerText = errors.join(" ");
+            errorBox.classList.remove("d-none");
+            errorBox.classList.add("d-flex");
+
+            // Clean up shake class after animation completes
+            setTimeout(() => {
+              card.classList.remove("shake");
+            }, 500);
+          } else {
+            // Apply valid styles (green glow)
+            card.classList.add("valid-card");
+            
+            // Wait 800ms and submit
+            setTimeout(() => {
+              form.submit();
+            }, 800);
+          }
+        });
+      });
+    </script>
   </body>
 </html>
