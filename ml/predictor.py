@@ -60,9 +60,9 @@ def predict_customer(input_values: list) -> int:
     # Shape input list into a DataFrame with MODEL_FEATURES columns
     input_df = pd.DataFrame([input_values], columns=MODEL_FEATURES)
     
-    # Cast input columns to float/int
+    # Cast input columns to float
     for col in input_df.columns:
-        input_df[col] = pd.to_numeric(input_df[col])
+        input_df[col] = pd.to_numeric(input_df[col]).astype(float)
         
     # Transform using preprocessor
     X_preprocessed = preprocessor.transform(input_df)
