@@ -185,6 +185,13 @@ async def predictRouteClient(request: Request):
     except Exception as e:
         import logging as app_logging
         app_logging.exception("Prediction failed with error:")
+        err_msg = str(e)
+        if "Security policy violation" in err_msg:
+            error_to_show = f"Security Policy Violation: {err_msg} Please configure MODEL_TRUSTED=1 in your environment/Vercel settings."
+        elif "Trained model or preprocessor" in err_msg:
+            error_to_show = err_msg
+        else:
+            error_to_show = f"Prediction failed: {err_msg}"
         return templates.TemplateResponse(
             request,
             "customer.html",
@@ -192,7 +199,7 @@ async def predictRouteClient(request: Request):
                 "context": None,
                 "user_data": None,
                 "cluster_averages": None,
-                "error": "Prediction failed. Check model storage and environment configuration.",
+                "error": error_to_show,
                 "user": user
             },
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
