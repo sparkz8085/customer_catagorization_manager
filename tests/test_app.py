@@ -98,3 +98,29 @@ def test_custom_info_login():
     assert "session" in response.cookies
 
 
+def test_safe_unpickler_allowed():
+    import io
+    import pickle
+    from ml.predictor import SafeUnpickler
+    
+    # Test builtins and numpy types (allowed)
+    data = pickle.dumps({"key": (1, 2, "value")})
+    unpickled = SafeUnpickler(io.BytesIO(data)).load()
+    assert unpickled["key"] == (1, 2, "value")
+
+
+def test_safe_unpickler_blocked():
+    import io
+    import pickle
+    import pytest
+    from ml.predictor import SafeUnpickler
+    
+    # Test blocked classes (like subprocess.Popen)
+    import subprocess
+    data = pickle.dumps(subprocess.Popen)
+    with pytest.raises(pickle.UnpicklingError) as exc_info:
+        SafeUnpickler(io.BytesIO(data)).load()
+    assert "blocked during unpickling" in str(exc_info.value)
+
+
+
