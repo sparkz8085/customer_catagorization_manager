@@ -81,7 +81,7 @@ def test_prediction_endpoint_success():
 
 def test_mock_callback_auth():
     response = client.get("/auth/mock-callback?provider=google", follow_redirects=False)
-    assert response.status_code == 307
+    assert response.status_code == 303
     assert response.headers["location"] == "/?welcome=true"
     assert "session" in response.cookies
 
@@ -93,7 +93,7 @@ def test_custom_info_login():
         "email": "arthur@camelot.org",
         "password": "Password123!"
     }, follow_redirects=False)
-    assert response.status_code == 307
+    assert response.status_code == 303
     assert response.headers["location"] == "/?welcome=true"
     assert "session" in response.cookies
 

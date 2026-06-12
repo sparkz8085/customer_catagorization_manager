@@ -129,7 +129,7 @@ async def callback_google(request: Request, code: str = None, error: str = None)
         
         # Create session cookie
         session_cookie = create_session_cookie(user)
-        response = RedirectResponse(url="/?welcome=true")
+        response = RedirectResponse(url="/?welcome=true", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(
             key="session",
             value=session_cookie,
@@ -195,7 +195,7 @@ async def callback_facebook(request: Request, code: str = None, error: str = Non
         
         # Create session cookie
         session_cookie = create_session_cookie(user)
-        response = RedirectResponse(url="/?welcome=true")
+        response = RedirectResponse(url="/?welcome=true", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(
             key="session",
             value=session_cookie,
@@ -234,7 +234,7 @@ async def mock_callback(request: Request, provider: str):
     )
     
     session_cookie = create_session_cookie(user)
-    response = RedirectResponse(url="/?welcome=true")
+    response = RedirectResponse(url="/?welcome=true", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(
         key="session",
         value=session_cookie,
@@ -264,7 +264,7 @@ async def login_email(request: Request, name: str = Form(...), email: str = Form
     )
     
     session_cookie = create_session_cookie(user)
-    response = RedirectResponse(url="/?welcome=true")
+    response = RedirectResponse(url="/?welcome=true", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(
         key="session",
         value=session_cookie,
