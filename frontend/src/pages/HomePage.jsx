@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { DarkVeil } from '../components/AnimatedBackgrounds';
 
-const startFreeUrl = 'https://cryptox-neuron-ai.onrender.com/';
+const startFreeUrl = 'https://customer-catagorization-manager-dq6.vercel.app/login';
 
 const featureCards = [
   { title: 'AI Segmentation', description: 'Cluster customers using intelligent models and clear visual profiles.' },

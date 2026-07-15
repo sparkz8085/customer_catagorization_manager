@@ -13,13 +13,7 @@ export default function LoginPage() {
       >
         <span className="badge">Secure Access</span>
         <h2>Welcome back</h2>
-        <p>Use the existing backend login flow while enjoying the new premium SaaS experience.</p>
-
-        <div className="login-actions">
-          <a className="oauth-button google" href="/login/google">Continue with Google</a>
-        </div>
-
-        <div className="login-divider">or</div>
+        <p>Sign in to your account or create a new session to continue.</p>
 
         <form className="login-form" action="/login/email" method="post">
           <label>
@@ -45,4 +39,4 @@ export default function LoginPage() {
       </motion.div>
     </section>
   );
-}
+};
