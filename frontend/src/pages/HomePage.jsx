@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { DarkVeil } from '../components/AnimatedBackgrounds';
 
+const startFreeUrl = 'https://cryptox-neuron-ai.onrender.com/';
+
 const featureCards = [
   { title: 'AI Segmentation', description: 'Cluster customers using intelligent models and clear visual profiles.' },
   { title: 'Smart Analytics', description: 'Track purchasing behavior, preferences, and actionable trends.' },
@@ -35,7 +37,7 @@ export default function HomePage() {
             Segment, classify and analyze customers using intelligent machine learning algorithms with beautiful analytics.
           </motion.p>
           <motion.div className="hero-actions" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>
-            <Link to="/login" className="primary-button large">Start for Free</Link>
+            <a href={startFreeUrl} className="primary-button large">Start for Free</a>
             <Link to="/pricing" className="secondary-button large">Try Demo</Link>
           </motion.div>
           <div className="hero-stats">

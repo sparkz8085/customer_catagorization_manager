@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
+const startFreeUrl = 'https://cryptox-neuron-ai.onrender.com/';
+
 const navItems = [
   { label: 'Home', to: '/' },
   { label: 'Features', to: '/features' },
@@ -65,9 +67,9 @@ export default function Navbar() {
           <NavLink to="/login" className="ghost-link" onClick={() => setOpen(false)}>
             Login
           </NavLink>
-          <NavLink to="/login" className="primary-button" onClick={() => setOpen(false)}>
+          <a href={startFreeUrl} className="primary-button" onClick={() => setOpen(false)}>
             Start for Free
-          </NavLink>
+          </a>
         </div>
       </div>
     </header>
