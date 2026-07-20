@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cryptox Neuron - Bulk Customer Categorization</title>
+    <!-- Fonts & Bootstrap -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+      (function() {
+        const savedTheme = localStorage.getItem('app-theme') || 'light';
+        if (savedTheme === 'dark') {
+          document.documentElement.classList.add('dark-theme');
+        }
+      })();
+    </script>
+    <style>
+      /* Drag and Drop Zone */
+      .drop-zone {
+        border: 2px dashed var(--input-border);
+        border-radius: 12px;
+        padding: 40px;
+        text-align: center;
+        transition: all 0.3s ease;
+        background-color: rgba(0,0,0,0.02);
+        cursor: pointer;
+      }
+      .drop-zone.dragover {
+        border-color: #3b82f6;
+        background-color: rgba(59, 130, 246, 0.05);
+      }
+      .dark-theme .drop-zone {
+        background-color: rgba(255,255,255,0.02);
+      }
+      .dark-theme .drop-zone.dragover {
+        background-color: rgba(59, 130, 246, 0.1);
+      }
+      
+      /* Progress Bar */
+      .progress-container {
+        display: none;
+        margin-top: 20px;
+      }
+      
+      /* Dashboard */
+      #dashboard-section {
+        display: none;
+      }
+      .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+      }
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #3b82f6;
+      }
+      
+      /* Results Table */
+      .table-container {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .table-custom {
+        color: var(--text-color);
+      }
+      .table-custom th {
+        background: var(--navbar-bg);
+        color: var(--text-color);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+      }
+      .dark-theme .table-custom td {
+        border-color: var(--border-color);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light border-bottom py-3">
+      <div class="container-fluid px-4">
+        <a class="navbar-brand d-flex align-items-center" href="/">
+          <img src="{{ url_for('static', path='/images/logo.jpg') }}" class="me-2 rounded shadow-sm" alt="Logo" style="height: 38px; border: 1px solid #cbd5e1;"/>
+          <span class="fw-extrabold text-primary fs-4">Cryptox Neuron</span>
+        </a>
+        <div class="d-flex gap-3 align-items-center">
+            <a href="/" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-bold">Single Prediction</a>
+            <div class="dropdown me-2">
+              <button class="btn btn-outline-secondary btn-sm dropdown-toggle rounded-pill px-3 py-1.5" type="button" id="appearanceDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <span>Appearance</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-3 rounded-custom" style="min-width: 200px; background: var(--card-bg); color: var(--text-color);">
+                <li>
+                  <h6 class="dropdown-header px-0 text-uppercase fw-bold text-muted mb-2">App Theme</h6>
+                  <div class="btn-group w-100" role="group">
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="theme-light-btn">Light</button>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="theme-dark-btn">Dark</button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1">Logout</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container px-4 py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold m-0">Bulk Categorization</h2>
+      </div>
+      
+      <!-- Upload Section -->
+      <div class="card shadow-sm border-0 p-4 bg-white rounded-custom mb-4" id="upload-card">
+        <div class="drop-zone" id="drop-zone">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="text-primary mb-3" viewBox="0 0 16 16">
+            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+          </svg>
+          <h5 class="fw-bold">Drag & Drop your file here</h5>
+          <p class="text-muted small">or click to browse from your computer</p>
+          <input type="file" id="file-input" class="d-none" accept=".csv, .xls, .xlsx">
+          <button class="btn btn-primary px-4 py-2 mt-2" onclick="document.getElementById('file-input').click()">Browse File</button>
+          <div class="mt-3 small text-muted">Supported formats: .csv, .xlsx, .xls</div>
+        </div>
+        
+        <!-- Error Alert -->
+        <div class="alert alert-danger mt-3 d-none" id="upload-error"></div>
+        
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progress-container">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="fw-bold" id="progress-text">Uploading...</span>
+          </div>
+          <div class="progress" style="height: 10px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Dashboard Section -->
+      <div id="dashboard-section">
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="text-muted fw-bold text-uppercase small">Total Records</div>
+              <div class="stat-value" id="stat-total">0</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="text-muted fw-bold text-uppercase small text-success">Successful</div>
+              <div class="stat-value text-success" id="stat-success">0</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="text-muted fw-bold text-uppercase small text-danger">Failed</div>
+              <div class="stat-value text-danger" id="stat-failed">0</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="text-muted fw-bold text-uppercase small text-info">Process Time</div>
+              <div class="stat-value text-info" id="stat-time">0s</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Charts -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <div class="card shadow-sm border-0 p-3 bg-white rounded-custom h-100">
+              <h6 class="fw-bold mb-3 text-center">Category Distribution</h6>
+              <div id="pie-chart"></div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card shadow-sm border-0 p-3 bg-white rounded-custom h-100">
+              <h6 class="fw-bold mb-3 text-center">Count per Category</h6>
+              <div id="bar-chart"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 justify-content-end mb-3">
+          <a href="#" class="btn btn-success" id="btn-download-csv">Download CSV</a>
+          <a href="#" class="btn btn-outline-success" id="btn-download-excel">Download Excel</a>
+          <button class="btn btn-secondary" onclick="resetUpload()">Upload Another</button>
+        </div>
+        
+        <!-- Table -->
+        <div class="card shadow-sm border-0 bg-white rounded-custom overflow-hidden">
+          <div class="table-container p-0">
+            <table class="table table-hover table-custom m-0">
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Customer Name</th>
+                  <th>Age</th>
+                  <th>Income</th>
+                  <th>Spending</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="results-table-body">
+                <!-- Data populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Theme switching
+      document.addEventListener("DOMContentLoaded", function() {
+        const themeLightBtn = document.getElementById('theme-light-btn');
+        const themeDarkBtn = document.getElementById('theme-dark-btn');
+        
+        function setTheme(theme) {
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark-theme');
+            document.body.classList.add('dark-theme');
+          } else {
+            document.documentElement.classList.remove('dark-theme');
+            document.body.classList.remove('dark-theme');
+          }
+          localStorage.setItem('app-theme', theme);
+          
+          if(window.pieChart) window.pieChart.updateOptions({ theme: { mode: theme } });
+          if(window.barChart) window.barChart.updateOptions({ theme: { mode: theme } });
+        }
+        
+        const savedTheme = localStorage.getItem('app-theme') || 'light';
+        setTheme(savedTheme);
+        
+        if (themeLightBtn) themeLightBtn.addEventListener('click', () => setTheme('light'));
+        if (themeDarkBtn) themeDarkBtn.addEventListener('click', () => setTheme('dark'));
+      });
+
+      // Drag and Drop Logic
+      const dropZone = document.getElementById('drop-zone');
+      const fileInput = document.getElementById('file-input');
+      const errorAlert = document.getElementById('upload-error');
+      const progressContainer = document.getElementById('progress-container');
+      const progressText = document.getElementById('progress-text');
+      const dashboardSection = document.getElementById('dashboard-section');
+      const uploadCard = document.getElementById('upload-card');
+      
+      let currentBulkId = null;
+
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+      });
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+      });
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+          handleFileUpload(e.dataTransfer.files[0]);
+        }
+      });
+      fileInput.addEventListener('change', () => {
+        if (fileInput.files.length) {
+          handleFileUpload(fileInput.files[0]);
+        }
+      });
+      
+      function resetUpload() {
+        fileInput.value = "";
+        uploadCard.style.display = 'block';
+        dashboardSection.style.display = 'none';
+        progressContainer.style.display = 'none';
+        errorAlert.classList.add('d-none');
+      }
+
+      function handleFileUpload(file) {
+        errorAlert.classList.add('d-none');
+        
+        const ext = file.name.split('.').pop().toLowerCase();
+        if(!['csv', 'xls', 'xlsx'].includes(ext)) {
+          errorAlert.textContent = "Unsupported file format. Please upload a .csv, .xls, or .xlsx file.";
+          errorAlert.classList.remove('d-none');
+          return;
+        }
+        
+        if(file.size > 10 * 1024 * 1024) { // 10MB limit
+          errorAlert.textContent = "File is too large. Maximum size is 10MB.";
+          errorAlert.classList.remove('d-none');
+          return;
+        }
+
+        // Start upload
+        const formData = new FormData();
+        formData.append("file", file);
+        
+        progressContainer.style.display = 'block';
+        progressText.textContent = "Uploading and processing...";
+        
+        fetch('/api/bulk-upload', {
+          method: 'POST',
+          body: formData
+        })
+        .then(async response => {
+          const isJson = response.headers.get('content-type')?.includes('application/json');
+          const data = isJson ? await response.json() : null;
+
+          if (!response.ok) {
+            const errorMsg = data && (data.message || data.detail) ? (data.message || data.detail) : (response.statusText || 'An unexpected server error occurred.');
+            return Promise.reject(new Error(errorMsg));
+          }
+          
+          if (!data || data.status !== "success") {
+            return Promise.reject(new Error("Invalid response from server."));
+          }
+          
+          return data;
+        })
+        .then(data => {
+            currentBulkId = data.bulk_id;
+            progressText.textContent = "Generating report...";
+            fetchDashboardData(currentBulkId);
+        })
+        .catch(err => {
+          progressContainer.style.display = 'none';
+          errorAlert.textContent = err.message;
+          errorAlert.classList.remove('d-none');
+        });
+      }
+
+      function fetchDashboardData(bulkId) {
+        fetch(`/api/bulk-results/${bulkId}`)
+          .then(async res => {
+              if (!res.ok) {
+                  const isJson = res.headers.get('content-type')?.includes('application/json');
+                  const errorData = isJson ? await res.json() : null;
+                  const errMessage = errorData && (errorData.message || errorData.detail) ? (errorData.message || errorData.detail) : `Error ${res.status}: ${res.statusText}`;
+                  throw new Error(errMessage);
+              }
+              return res.json();
+          })
+          .then(data => {
+            uploadCard.style.display = 'none';
+            dashboardSection.style.display = 'block';
+            
+            // Setup Links
+            document.getElementById('btn-download-csv').href = `/api/download/${bulkId}?format=csv`;
+            document.getElementById('btn-download-excel').href = `/api/download/${bulkId}?format=excel`;
+            
+            // Update Stats
+            document.getElementById('stat-total').textContent = data.total;
+            document.getElementById('stat-success').textContent = data.success;
+            document.getElementById('stat-failed').textContent = data.failed;
+            document.getElementById('stat-time').textContent = data.processing_time + 's';
+            
+            // Render Table
+            const tbody = document.getElementById('results-table-body');
+            tbody.innerHTML = '';
+            data.results.forEach(row => {
+              const tr = document.createElement('tr');
+              if (row.Status === 'Failed') tr.classList.add('table-danger');
+              
+              tr.innerHTML = `
+                <td>${row.row_index}</td>
+                <td>${row['Customer Name']}</td>
+                <td>${row.Age}</td>
+                <td>${row.Income}</td>
+                <td>${row['Spending Score']}</td>
+                <td class="fw-bold text-primary">${row['Predicted Category']}</td>
+                <td>
+                  <span class="badge ${row.Status === 'Success' ? 'bg-success' : 'bg-danger'}">${row.Status}</span>
+                </td>
+                <td class="small text-muted">${row.Remarks}</td>
+              `;
+              tbody.appendChild(tr);
+            });
+            
+            // Render Charts
+            renderCharts(data.category_counts);
+          })
+          .catch(err => {
+            progressContainer.style.display = 'none';
+            errorAlert.textContent = "Failed to load results: " + err.message;
+            errorAlert.classList.remove('d-none');
+          });
+      }
+
+      function renderCharts(categoryCounts) {
+        const labels = Object.keys(categoryCounts);
+        const series = Object.values(categoryCounts);
+        const theme = localStorage.getItem('app-theme') || 'light';
+        const colors = ['#4e4bc0', '#f3dcb8', '#a4c2df', '#a2ded0', '#f59e0b', '#10b981'];
+
+        // Pie Chart
+        if (window.pieChart) window.pieChart.destroy();
+        window.pieChart = new ApexCharts(document.querySelector("#pie-chart"), {
+          chart: { type: 'pie', height: 300, background: 'transparent' },
+          series: series,
+          labels: labels,
+          colors: colors,
+          theme: { mode: theme }
+        });
+        window.pieChart.render();
+
+        // Bar Chart
+        if (window.barChart) window.barChart.destroy();
+        window.barChart = new ApexCharts(document.querySelector("#bar-chart"), {
+          chart: { type: 'bar', height: 300, toolbar: { show: false }, background: 'transparent' },
+          series: [{ name: 'Customers', data: series }],
+          xaxis: { categories: labels },
+          colors: ['#3b82f6'],
+          theme: { mode: theme }
+        });
+        window.barChart.render();
+      }
+    </script>
+  </body>
+</html>

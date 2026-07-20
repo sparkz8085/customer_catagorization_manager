@@ -25,9 +25,6 @@ def extract_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     dataset = df.copy()
     
-    # Age of the customer
-    dataset['Age'] = 2022 - dataset['Year_Birth']
-    
     # Categorical encoding
     dataset["Education"].replace({"Basic": 0, "2n Cycle": 1, "Graduation": 2, "Master": 3, "PhD": 4}, inplace=True)
     dataset['Marital_Status'].replace({"Married": 1, "Together": 1, "Absurd": 0, "Widow": 0, "YOLO": 0, "Divorced": 0, "Single": 0, "Alone": 0}, inplace=True)

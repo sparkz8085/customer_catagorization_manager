@@ -13,7 +13,8 @@ async def trainRouteClient(x_training_api_key: str = Header(default="")):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Training is disabled in this environment.",
         )
-    if x_training_api_key != expected_key:
+    import hmac
+    if not hmac.compare_digest(x_training_api_key, expected_key):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
     try:

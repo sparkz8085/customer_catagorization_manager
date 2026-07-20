@@ -6,7 +6,7 @@ from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from services.auth_session import create_session_cookie
-from database.user_store import upsert_user
+from database.user_store import upsert_user, create_user_with_password, get_user_by_email, verify_password
 
 router = APIRouter()
 templates_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "templates"))
@@ -19,10 +19,11 @@ FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID", "")
 FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET", "")
 
 def get_redirect_uri(request: Request, provider: str) -> str:
-    """Helper to dynamically construct the redirect URI based on headers or scheme."""
-    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
-    host = request.headers.get("x-forwarded-host", request.url.netloc)
-    return f"{proto}://{host}/auth/callback/{provider}"
+    """Helper to dynamically construct the redirect URI securely."""
+    base_url = os.getenv("APP_BASE_URL")
+    if base_url:
+        return f"{base_url.rstrip('/')}/auth/callback/{provider}"
+    return str(request.url_for(f"callback_{provider}"))
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, error: str = None, info: str = None):
@@ -245,24 +246,40 @@ async def mock_callback(request: Request, provider: str):
     )
     return response
 
-@router.post("/login/email")
-async def login_email(request: Request, name: str = Form(...), email: str = Form(...), nickname: str = Form(None), password: str = Form(None)):
-    """Handles standard simulated developer email logins."""
-    if not email or not name:
-        return RedirectResponse(url="/login?error=Email+and+Name+are+required")
+@router.post("/register")
+async def register_user(request: Request, name: str = Form(...), email: str = Form(...), nickname: str = Form(None), password: str = Form(...)):
+    """Registers a new user with a securely hashed password."""
+    if not email or not name or not password:
+        return RedirectResponse(url="/login?error=Email,+Name,+and+Password+are+required", status_code=status.HTTP_303_SEE_OTHER)
         
-    avatar = f"https://api.dicebear.com/7.x/initials/svg?seed={name}"
+    user = create_user_with_password(email=email, name=name, nickname=nickname, plain_password=password)
     
-    user = upsert_user(
-        provider="mock",
-        provider_uid=f"mock-email-{secrets.token_hex(4)}",
-        email=email,
-        name=name,
-        avatar_url=avatar,
-        nickname=nickname,
-        password=password
+    if not user:
+        return RedirectResponse(url="/login?error=Email+is+already+registered", status_code=status.HTTP_303_SEE_OTHER)
+        
+    session_cookie = create_session_cookie(user)
+    response = RedirectResponse(url="/?welcome=true", status_code=status.HTTP_303_SEE_OTHER)
+    response.set_cookie(
+        key="session",
+        value=session_cookie,
+        httponly=True,
+        max_age=86400 * 30,
+        samesite="lax",
+        secure=request.url.scheme == "https"
     )
+    return response
+
+@router.post("/login/email")
+async def login_email(request: Request, email: str = Form(...), password: str = Form(...)):
+    """Authenticates a user via email and password."""
+    if not email or not password:
+        return RedirectResponse(url="/login?error=Email+and+Password+are+required", status_code=status.HTTP_303_SEE_OTHER)
+        
+    user = get_user_by_email(email)
     
+    if not user or user.get("provider") != "email" or not verify_password(password, user.get("password")):
+        return RedirectResponse(url="/login?error=Invalid+email+or+password", status_code=status.HTTP_303_SEE_OTHER)
+        
     session_cookie = create_session_cookie(user)
     response = RedirectResponse(url="/?welcome=true", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(

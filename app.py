@@ -11,6 +11,7 @@ from config import APP_HOST, APP_PORT
 from routes.prediction import router as prediction_router
 from routes.training import router as training_router
 from routes.auth import router as auth_router
+from routes.bulk import router as bulk_router
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -56,6 +57,21 @@ async def add_security_headers(request: Request, call_next):
 app.include_router(auth_router)
 app.include_router(prediction_router)
 app.include_router(training_router)
+app.include_router(bulk_router)
+
+import logging
+from fastapi.responses import JSONResponse
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Unhandled Global Exception on {request.url.path}: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"status": False, "message": "An unexpected internal server error occurred.", "detail": str(exc)}
+    )
 
 @app.get("/health")
 async def health_check():

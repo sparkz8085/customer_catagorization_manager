@@ -360,24 +360,16 @@
         <!-- Tab selection -->
         <ul class="nav nav-tabs justify-content-center" id="authTab" role="tablist">
           <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="social-tab" data-bs-toggle="tab" data-bs-target="#social-auth" type="button" role="tab" aria-controls="social-auth" aria-selected="true">Login</button>
+            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-auth" type="button" role="tab" aria-controls="login-auth" aria-selected="true">Login</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="mock-tab" data-bs-toggle="tab" data-bs-target="#mock-auth" type="button" role="tab" aria-controls="mock-auth" aria-selected="false">Sign In</button>
+            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-auth" type="button" role="tab" aria-controls="register-auth" aria-selected="false">Register</button>
           </li>
         </ul>
 
         <div class="tab-content" id="authTabContent">
-          <!-- SOCIAL AUTH TAB -->
-          <div class="tab-pane fade show active" id="social-auth" role="tabpanel" aria-labelledby="social-tab">
-            
-            {% if not google_configured or not facebook_configured %}
-            <div class="text-center">
-              <span class="dev-mode-badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);">OAuth Keys Missing</span>
-              <p class="small text-muted mb-4">Your data will remain encrypted and safe with us! To sign in with your real account, configure your OAuth credentials in the environment, or use the <strong>Sign In</strong> tab for simulated development logins.</p>
-            </div>
-            {% endif %}
-
+          <!-- LOGIN TAB -->
+          <div class="tab-pane fade show active" id="login-auth" role="tabpanel" aria-labelledby="login-tab">
             <!-- Google Login Button -->
             <a href="/login/google" class="btn btn-oauth btn-google text-decoration-none">
               <!-- Google Color Icon SVG -->
@@ -394,40 +386,35 @@
 
             <!-- Facebook Login Button -->
             <a href="/login/facebook" class="btn btn-oauth btn-facebook text-decoration-none">
-              <!-- Facebook Icon SVG -->
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z"/>
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>
               <span>Sign in with Facebook</span>
             </a>
+
+            <div class="divider">Or login with email</div>
+
+            <form action="/login/email" method="post" id="login-form">
+              <div class="mb-3">
+                <label for="login-email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="login-email" name="email" placeholder="e.g. john@example.com" required>
+              </div>
+              <div class="mb-3">
+                <label for="login-password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="login-password" name="password" placeholder="••••••••" required>
+              </div>
+              <button type="submit" class="btn btn-submit w-100">Log In</button>
+            </form>
           </div>
-
-          <!-- MOCK SIGN IN TAB -->
-          <div class="tab-pane fade" id="mock-auth" role="tabpanel" aria-labelledby="mock-tab">
-            <div class="sim-card">
-              <h6 class="fw-bold text-center mb-3 text-warning">Login options</h6>
-              
-              <a href="/auth/mock-callback?provider=google" class="btn-sim-login text-decoration-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352-2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063c.632 1.896 2.405 3.304 4.492 3.304 1.108 0 2.04-.294 2.766-.8a4.26 4.26 0 0 0 1.439-2.755H8V6.558h7.545z"/></svg>
-                Sign in with Google Account
-              </a>
-
-              <a href="/auth/mock-callback?provider=facebook" class="btn-sim-login text-decoration-none">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/></svg>
-                Sign in with Facebook Account
-              </a>
-            </div>
-
-            <div class="divider">Or custom info</div>
-
-            <form action="/login/email" method="post" id="custom-auth-form">
+          
+          <!-- REGISTER TAB -->
+          <div class="tab-pane fade" id="register-auth" role="tabpanel" aria-labelledby="register-tab">
+            <form action="/register" method="post" id="register-form">
               <div class="mb-3">
                 <label for="name" class="form-label">Full Name</label>
                 <input type="text" class="form-control" id="name" name="name" placeholder="e.g. John Doe" required>
               </div>
               <div class="mb-3">
                 <label for="nickname" class="form-label">Nick Name</label>
-                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="e.g. Johnny" required>
+                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="e.g. Johnny">
               </div>
               <div class="mb-3">
                 <label for="email" class="form-label">Email Address</label>
@@ -456,7 +443,7 @@
                 <div id="validation-msg" style="font-size: 0.85rem;"></div>
               </div>
 
-              <button type="submit" class="btn btn-submit w-100">Log In</button>
+              <button type="submit" class="btn btn-submit w-100">Register</button>
             </form>
           </div>
         </div>
@@ -473,10 +460,8 @@
     <!-- Custom Validation JavaScript -->
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        const form = document.getElementById("custom-auth-form");
+        const form = document.getElementById("register-form");
         const card = document.querySelector(".glass-card");
-        const nameInput = document.getElementById("name");
-        const nicknameInput = document.getElementById("nickname");
         const passwordInput = document.getElementById("password");
         const emailInput = document.getElementById("email");
         const errorBox = document.getElementById("validation-errors");

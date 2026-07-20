@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
-const startFreeUrl = 'https://cryptox-neuron-ai.onrender.com/';
+const startFreeUrl = 'https://customer-catagorization-manager-dq6.vercel.app/login';
 
 const navItems = [
   { label: 'Home', to: '/' },
@@ -64,7 +64,7 @@ export default function Navbar() {
         </nav>
 
         <div className="nav-actions">
-          <NavLink to="/login" className="ghost-link" onClick={() => setOpen(false)}>
+          <NavLink to={startFreeUrl} className="ghost-link" onClick={() => setOpen(false)}>
             Login
           </NavLink>
           <a href={startFreeUrl} className="primary-button" onClick={() => setOpen(false)}>

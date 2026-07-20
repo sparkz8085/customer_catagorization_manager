@@ -29,6 +29,10 @@
         
         {% if user %}
         <div class="d-flex align-items-center gap-3">
+          <a href="/bulk-upload" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 fw-bold d-flex align-items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/></svg>
+            Bulk Upload
+          </a>
           <!-- Appearance Settings Dropdown -->
           <div class="dropdown me-2">
             <button class="btn btn-outline-secondary btn-sm dropdown-toggle rounded-pill px-3 py-1.5 d-flex align-items-center gap-2" type="button" id="appearanceDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.85rem; font-weight: 600;">
@@ -49,7 +53,7 @@
               </li>
               
               <!-- Predict Card Style Section -->
-              <li>
+            <li>
                 <h6 class="dropdown-header px-0 text-uppercase tracking-wider fw-bold text-muted mb-2" style="font-size: 0.7rem; border: none;">Predict Style</h6>
                 <select class="form-select form-select-sm" id="predict-style-select">
                   <option value="default">Default Clean</option>
@@ -107,59 +111,20 @@
         <!-- Input Form Column -->
         <div class="col-lg-{% if context is not none %}5{% else %}8 mx-auto{% endif %}">
           <div class="card shadow-sm border-0 p-4 bg-white rounded-custom" id="predict-card">
-            <h3 class="fw-bold mb-4 text-dark text-center">Customer Characteristics</h3>
+            <h3 class="fw-bold mb-4 text-center">Customer Characteristics</h3>
             
             <form action="/" method="post">
               
-              <!-- SECTION 1: DEMOGRAPHICS & BACKGROUND -->
-              <div class="form-section-title">Demographics & Background</div>
+              <!-- SECTION 1: DEMOGRAPHICS -->
+              <div class="form-section-title mt-0">Demographics</div>
               <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                  <label for="Age" class="form-label font-semibold">Age</label>
+                  <label for="Age" class="form-label">Customer Age</label>
                   <input type="number" class="form-control" id="Age" name="Age" placeholder="e.g. 35" required value="{{ user_data.Age if user_data else '' }}">
                 </div>
                 <div class="col-md-6">
-                  <label for="Income" class="form-label">Annual Income ($)</label>
+                  <label for="Income" class="form-label">Net Income / Salary ($)</label>
                   <input type="number" class="form-control" id="Income" name="Income" placeholder="e.g. 55000" required value="{{ user_data.Income if user_data else '' }}">
-                </div>
-                <div class="col-md-6">
-                  <label for="Education" class="form-label">Education Level</label>
-                  <select class="form-select" id="Education" name="Education" required>
-                    <option value="" disabled {% if not user_data %}selected{% endif %}>Select Education</option>
-                    <option value="0" {% if user_data and user_data.Education == 0 %}selected{% endif %}>Basic</option>
-                    <option value="1" {% if user_data and user_data.Education == 1 %}selected{% endif %}>2n Cycle</option>
-                    <option value="2" {% if user_data and user_data.Education == 2 %}selected{% endif %}>Graduation</option>
-                    <option value="3" {% if user_data and user_data.Education == 3 %}selected{% endif %}>Master</option>
-                    <option value="4" {% if user_data and user_data.Education == 4 %}selected{% endif %}>PhD</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label for="Marital_Status" class="form-label">Married / Cohabiting</label>
-                  <select class="form-select" id="Marital_Status" name="Marital_Status" required>
-                    <option value="" disabled {% if not user_data %}selected{% endif %}>Select Status</option>
-                    <option value="0" {% if user_data and user_data.Marital_Status == 0 %}selected{% endif %}>N (Single/Divorced/Alone)</option>
-                    <option value="1" {% if user_data and user_data.Marital_Status == 1 %}selected{% endif %}>Y (Married/Together)</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label for="Parental_Status" class="form-label">Has Kids / Teens</label>
-                  <select class="form-select" id="Parental_Status" name="Parental_Status" required>
-                    <option value="" disabled {% if not user_data %}selected{% endif %}>Select Status</option>
-                    <option value="0" {% if user_data and user_data.Parental_Status == 0 %}selected{% endif %}>N</option>
-                    <option value="1" {% if user_data and user_data.Parental_Status == 1 %}selected{% endif %}>Y</option>
-                  </select>
-                </div>
-                <div class="col-md-6">
-                  <label for="Children" class="form-label">Total Children</label>
-                  <input type="number" class="form-control" id="Children" name="Children" placeholder="e.g. 1" required value="{{ user_data.Children if user_data else '' }}">
-                </div>
-                <div class="col-md-6">
-                  <label for="Days_as_Customer" class="form-label">Days as Customer</label>
-                  <input type="number" class="form-control" id="Days_as_Customer" name="Days_as_Customer" placeholder="e.g. 500" required value="{{ user_data.Days_as_Customer if user_data else '' }}">
-                </div>
-                <div class="col-md-6">
-                  <label for="Recency" class="form-label">Days Since Last Purchase</label>
-                  <input type="number" class="form-control" id="Recency" name="Recency" placeholder="e.g. 15" required value="{{ user_data.Recency if user_data else '' }}">
                 </div>
               </div>
 
@@ -281,19 +246,19 @@
         
         // Dynamic input data from python context
         const userData = {
-          Income: {{ user_data.Income or 0 }},
-          Total_Spending: {{ user_data.Total_Spending or 0 }},
-          Wines: {{ user_data.Wines or 0 }},
-          Fruits: {{ user_data.Fruits or 0 }},
-          Meat: {{ user_data.Meat or 0 }},
-          Fish: {{ user_data.Fish or 0 }},
-          Sweets: {{ user_data.Sweets or 0 }},
-          Gold: {{ user_data.Gold or 0 }},
-          Web: {{ user_data.Web or 0 }},
-          Catalog: {{ user_data.Catalog or 0 }},
-          Store: {{ user_data.Store or 0 }},
-          Days_as_Customer: {{ user_data.Days_as_Customer or 0 }},
-          Discount_Purchases: {{ user_data.Discount_Purchases or 0 }}
+          Income: Number("{{ user_data.Income or 0 }}"),
+          Total_Spending: Number("{{ user_data.Total_Spending or 0 }}"),
+          Wines: Number("{{ user_data.Wines or 0 }}"),
+          Fruits: Number("{{ user_data.Fruits or 0 }}"),
+          Meat: Number("{{ user_data.Meat or 0 }}"),
+          Fish: Number("{{ user_data.Fish or 0 }}"),
+          Sweets: Number("{{ user_data.Sweets or 0 }}"),
+          Gold: Number("{{ user_data.Gold or 0 }}"),
+          Web: Number("{{ user_data.Web or 0 }}"),
+          Catalog: Number("{{ user_data.Catalog or 0 }}"),
+          Store: Number("{{ user_data.Store or 0 }}"),
+          Days_as_Customer: Number("{{ user_data.Days_as_Customer or 0 }}"),
+          Discount_Purchases: Number("{{ user_data.Discount_Purchases or 0 }}")
         };
 
         const totalPurchases = userData.Web + userData.Catalog + userData.Store;

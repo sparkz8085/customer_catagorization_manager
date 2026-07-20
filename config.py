@@ -22,7 +22,7 @@ PREPROCESSOR_PATH = os.path.join(ARTIFACTS_DIR, "preprocessor", PREPROCESSOR_FIL
 DROP_COLUMNS = ["ID", "Z_CostContact", "Z_Revenue"]
 
 RAW_COLUMNS = [
-    "Year_Birth", "Education", "Marital_Status", "Income", "Kidhome", "Teenhome",
+    "Income", "Kidhome", "Teenhome",
     "Dt_Customer", "Recency", "MntWines", "MntFruits", "MntMeatProducts",
     "MntFishProducts", "MntSweetProducts", "MntGoldProds", "NumDealsPurchases",
     "NumWebPurchases", "NumCatalogPurchases", "NumStorePurchases", "NumWebVisitsMonth",
@@ -31,13 +31,12 @@ RAW_COLUMNS = [
 ]
 
 MODEL_FEATURES = [
-    "Age", "Education", "Marital Status", "Parental Status", "Children", "Income",
-    "Total_Spending", "Days_as_Customer", "Recency", "Wines", "Fruits", "Meat",
+    "Income", "Total_Spending", "Days_as_Customer", "Recency", "Wines", "Fruits", "Meat",
     "Fish", "Sweets", "Gold", "Web", "Catalog", "Store", "Discount Purchases",
     "Total Promo", "NumWebVisitsMonth"
 ]
 
-OUTLIER_FEATURES = ["Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold", "Age", "Total_Spending"]
+OUTLIER_FEATURES = ["Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold", "Total_Spending"]
 
 # Training settings
 EXPECTED_ACCURACY = 0.6

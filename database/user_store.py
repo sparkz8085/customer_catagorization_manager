@@ -1,7 +1,20 @@
 import os
 import json
 import datetime
+import bcrypt
 from database.connection import get_mongodb_client
+
+def verify_password(plain_password, hashed_password):
+    if not hashed_password:
+        return False
+    # bcrypt expects bytes, so we encode strings
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+def get_password_hash(password):
+    # Hash password and return as string
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+
 
 # Local database file path
 LOCAL_USERS_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "users.json"))
@@ -53,9 +66,57 @@ def get_user_by_email(email: str) -> dict | None:
         finally:
             client.close()
             
-    # Fallback to local JSON
     users = _load_local_users()
     return users.get(email_lower)
+
+def create_user_with_password(email: str, name: str, nickname: str, plain_password: str) -> dict | None:
+    """
+    Creates a standard user with an email and hashed password. 
+    Returns None if email already exists.
+    """
+    email_lower = email.lower()
+    
+    # Check if user already exists
+    existing_user = get_user_by_email(email_lower)
+    if existing_user:
+        return None
+        
+    hashed_password = get_password_hash(plain_password)
+    now_str = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    avatar_url = f"https://api.dicebear.com/7.x/initials/svg?seed={name}"
+    
+    user_data = {
+        "email": email_lower,
+        "name": name,
+        "avatar_url": avatar_url,
+        "provider": "email",
+        "provider_uid": email_lower,
+        "created_at": now_str,
+        "last_login": now_str,
+        "nickname": nickname,
+        "password": hashed_password
+    }
+    
+    # Try MongoDB first
+    client = get_mongodb_client()
+    if client is not None:
+        try:
+            db = client["customer_db"]
+            collection = db["users"]
+            collection.insert_one(user_data)
+            if "_id" in user_data:
+                user_data["_id"] = str(user_data["_id"])
+            return user_data
+        except Exception as e:
+            print(f"[WARN] MongoDB insert failed ({e}). Saving to local database...")
+        finally:
+            client.close()
+            
+    # Fallback to local JSON
+    users = _load_local_users()
+    users[email_lower] = user_data
+    _save_local_users(users)
+    return user_data
 
 def upsert_user(provider: str, provider_uid: str, email: str, name: str, avatar_url: str, nickname: str = None, password: str = None) -> dict:
     """

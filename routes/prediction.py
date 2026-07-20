@@ -4,39 +4,38 @@ from fastapi import APIRouter, Request, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, ValidationError
+import logging
 from ml.predictor import predict_customer
 from services.auth_session import verify_session_cookie
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 templates_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "templates"))
 templates = Jinja2Templates(directory=templates_dir)
 
 class CustomerInput(BaseModel):
-    Age: int = Field(ge=0, le=120)
-    Education: int = Field(ge=0, le=4)
-    Marital_Status: int = Field(ge=0, le=1)
-    Parental_Status: int = Field(ge=0, le=1)
-    Children: int = Field(ge=0, le=20)
-    Income: float = Field(ge=0)
-    Total_Spending: float = Field(ge=0)
-    Days_as_Customer: int = Field(ge=0)
-    Recency: int = Field(ge=0)
-    Wines: int = Field(ge=0)
-    Fruits: int = Field(ge=0)
-    Meat: int = Field(ge=0)
-    Fish: float = Field(ge=0)
-    Sweets: int = Field(ge=0)
-    Gold: float = Field(ge=0)
-    Web: int = Field(ge=0)
-    Catalog: int = Field(ge=0)
-    Store: int = Field(ge=0)
-    Discount_Purchases: int = Field(ge=0)
-    Total_Promo: int = Field(ge=0)
-    NumWebVisitsMonth: int = Field(ge=0)
+    Age: int = Field(default=35, ge=0)
+    Income: float = Field(default=55000, ge=0)
+    Total_Spending: float = Field(default=0, ge=0)
+    Days_as_Customer: int = Field(default=4700, ge=0)
+    Recency: int = Field(default=15, ge=0)
+    Wines: int = Field(default=0, ge=0)
+    Fruits: int = Field(default=0, ge=0)
+    Meat: int = Field(default=0, ge=0)
+    Fish: float = Field(default=0, ge=0)
+    Sweets: int = Field(default=0, ge=0)
+    Gold: float = Field(default=0, ge=0)
+    Web: int = Field(default=0, ge=0)
+    Catalog: int = Field(default=0, ge=0)
+    Store: int = Field(default=0, ge=0)
+    Discount_Purchases: int = Field(default=0, ge=0)
+    Total_Promo: int = Field(default=0, ge=0)
+    NumWebVisitsMonth: int = Field(default=0, ge=0)
 
     def as_prediction_values(self) -> List[object]:
         data = self.model_dump() if hasattr(self, "model_dump") else self.dict()
-        fields = ["Age", "Education", "Marital_Status", "Parental_Status", "Children", "Income",
+        fields = ["Income",
                   "Total_Spending", "Days_as_Customer", "Recency", "Wines", "Fruits", "Meat",
                   "Fish", "Sweets", "Gold", "Web", "Catalog", "Store", "Discount_Purchases",
                   "Total_Promo", "NumWebVisitsMonth"]
@@ -44,11 +43,11 @@ class CustomerInput(BaseModel):
 
 async def parse_customer_input(request: Request) -> CustomerInput:
     form = await request.form()
-    fields = ["Age", "Education", "Marital_Status", "Parental_Status", "Children", "Income",
+    fields = ["Age", "Income",
               "Total_Spending", "Days_as_Customer", "Recency", "Wines", "Fruits", "Meat",
               "Fish", "Sweets", "Gold", "Web", "Catalog", "Store", "Discount_Purchases",
               "Total_Promo", "NumWebVisitsMonth"]
-    payload = {field: form.get(field) for field in fields}
+    payload = {field: form.get(field) for field in fields if form.get(field) not in (None, "")}
     return CustomerInput(**payload)
 
 @router.get("/")
@@ -151,6 +150,9 @@ async def predictRouteClient(request: Request):
     try:
         customer_input = await parse_customer_input(request)
         input_data = customer_input.as_prediction_values()
+        
+        logger.info(f"Running prediction for user {user.get('email')} with input data")
+        
         predicted_cluster = predict_customer(input_data)
         cluster_name = CLUSTER_MAPPING.get(predicted_cluster, str(predicted_cluster))
         
@@ -183,8 +185,7 @@ async def predictRouteClient(request: Request):
         )
 
     except Exception as e:
-        import logging as app_logging
-        app_logging.exception("Prediction failed with error:")
+        logger.error(f"Single prediction failed: {str(e)}", exc_info=True)
         err_msg = str(e)
         if "Security policy violation" in err_msg:
             error_to_show = f"Security Policy Violation: {err_msg} Please configure MODEL_TRUSTED=1 in your environment/Vercel settings."

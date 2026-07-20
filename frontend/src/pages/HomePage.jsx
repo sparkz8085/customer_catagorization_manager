@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { DarkVeil } from '../components/AnimatedBackgrounds';
 
 const startFreeUrl = 'https://customer-catagorization-manager-dq6.vercel.app/login';
+const loginUrl =[{startFreeUrl}];
 
 const featureCards = [
   { title: 'AI Segmentation', description: 'Cluster customers using intelligent models and clear visual profiles.' },
@@ -38,7 +39,7 @@ export default function HomePage() {
           </motion.p>
           <motion.div className="hero-actions" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>
             <a href={startFreeUrl} className="primary-button large">Start for Free</a>
-            <Link to="/pricing" className="secondary-button large">Try Demo</Link>
+            <Link to={loginUrl[1]} className="secondary-button large">Try Demo</Link>
           </motion.div>
           <div className="hero-stats">
             {stats.map((stat) => (
@@ -60,27 +61,29 @@ export default function HomePage() {
           </div>
           <div className="dashboard-grid">
             <div className="mini-card accent-card">
-              <span>Customer Segmentation</span>
+              <span>Customer Segmentation</span> 
               <strong>Budget / Regular / Premium / Occasional</strong>
             </div>
             <div className="mini-card">
               <span>AI Predictions</span>
               <strong>Cluster: Premium</strong>
             </div>
-            <div className="mini-chart chart-bar" />
-            <div className="mini-chart chart-pie" />
             <div className="mini-card wide">
               <span>Customer Distribution</span>
               <div className="distribution-bars">
-                <i style={{ width: '22%' }} />
-                <i style={{ width: '40%' }} />
-                <i style={{ width: '63%' }} />
-                <i style={{ width: '35%' }} />
+                <i style={{ width: '25%' }} /><strong style={{ width: '25%' }}>Budget[25%]</strong>
+                <i style={{ width: '20%' }} /><strong style={{ width: '20%' }}>Regular[20%]</strong>
+                <i style={{ width: '40%' }} /><strong style={{ width: '40%' }}>Premium[40%]</strong>
+                <i style={{ width: '15%' }} /><strong style={{ width: '15%' }}>Occasional[15%]</strong>
               </div>
             </div>
             <div className="mini-card">
               <span>Active Models</span>
               <strong>Training + Prediction</strong>
+            </div>
+            <div className="mini-card">
+              <span>Customer Distribution</span>
+              <strong>25% / 20% / 40% / 15%</strong>
             </div>
           </div>
         </motion.div>

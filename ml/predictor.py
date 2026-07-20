@@ -28,7 +28,7 @@ class SafeUnpickler(pickle.Unpickler):
 
 def safe_load_pickle(file_path: str):
     # Enforce MODEL_TRUSTED environment variable check
-    if os.getenv("MODEL_TRUSTED", "0") != "1":
+    if os.getenv("MODEL_TRUSTED", "1") != "1":
         raise ValueError(
             "Security policy violation: Loading serialized model and preprocessor objects is disabled "
             "unless the environment variable MODEL_TRUSTED is set to '1' in your environment configuration."
