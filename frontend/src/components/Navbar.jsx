@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 
-const startFreeUrl = 'https://customer-catagorization-manager-dq6.vercel.app/login';
+const startFreeUrl = 'https://cryptox-neuron-ai.onrender.com/';
 
 const navItems = [
   { label: 'Home', to: '/' },
@@ -25,10 +25,10 @@ export default function Navbar() {
     <header className="navbar-wrap">
       <div className="navbar glass-panel">
         <Link to="/" className="brand" onClick={() => setOpen(false)}>
-          <span className="brand-mark">CC</span>
+          <span className="brand-mark">CX</span>
           <span>
-            <strong>Customer Categorizer</strong>
-            <small>System</small>
+            <strong>CryptoX Neuron</strong>
+            <small>AI Gateway</small>
           </span>
         </Link>
 
@@ -64,7 +64,7 @@ export default function Navbar() {
         </nav>
 
         <div className="nav-actions">
-          <NavLink to={startFreeUrl} className="ghost-link" onClick={() => setOpen(false)}>
+          <NavLink to="/login" className="ghost-link" onClick={() => setOpen(false)}>
             Login
           </NavLink>
           <a href={startFreeUrl} className="primary-button" onClick={() => setOpen(false)}>

@@ -15,28 +15,10 @@ export default function LoginPage() {
         <h2>Welcome back</h2>
         <p>Sign in to your account or create a new session to continue.</p>
 
-        <form className="login-form" action="/login/email" method="post">
-          <label>
-            Full Name
-            <input type="text" name="name" placeholder="Enter your name" required />
-          </label>
-          <label>
-            Email
-            <input type="email" name="email" placeholder="name@company.com" required />
-          </label>
-          <label>
-            Nickname
-            <input type="text" name="nickname" placeholder="Your display name" />
-          </label>
-          <label>
-            Password
-            <input type="password" name="password" placeholder="Create a password" />
-          </label>
-          <button type="submit" className="primary-button full-width">Create Session</button>
-        </form>
+        <a href="https://cryptox-neuron-ai.onrender.com/" className="primary-button full-width" style={{display: 'inline-block', textAlign: 'center'}}>Continue to CryptoX Neuron AI</a>
 
         <Link to="/" className="back-link">Back to home</Link>
       </motion.div>
     </section>
   );
-};
+}

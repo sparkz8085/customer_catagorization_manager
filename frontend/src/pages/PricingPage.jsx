@@ -7,17 +7,20 @@ const plans = [
     name: 'Starter',
     price: '₹0/month',
     features: ['Basic Analytics', 'Demo Dataset', 'Community Support'],
+    cta: 'Start for Free',
   },
   {
     name: 'Professional',
     price: '₹999/month',
     features: ['Unlimited Customers', 'AI Predictions', 'Reports', 'API Access'],
     featured: true,
+    cta: 'Start Professional',
   },
   {
     name: 'Enterprise',
     price: 'Custom Pricing',
     features: ['Dedicated AI Models', 'Custom Integrations', 'Priority Support', 'Team Management'],
+    cta: 'Contact Sales',
   },
 ];
 
@@ -48,9 +51,9 @@ export default function PricingPage() {
                 <li key={feature}>✔ {feature}</li>
               ))}
             </ul>
-            <button type="button" className={plan.featured ? 'primary-button full-width' : 'secondary-button full-width'}>
-              {plan.featured ? 'Get Started' : 'Choose Plan'}
-            </button>
+            <a href="https://cryptox-neuron-ai.onrender.com/" className={plan.featured ? 'primary-button full-width' : 'secondary-button full-width'} style={{display: 'inline-block', textAlign: 'center'}}>
+              {plan.cta}
+            </a>
           </motion.article>
         ))}
       </div>

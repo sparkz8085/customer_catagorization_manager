@@ -1,10 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { DarkVeil } from '../components/AnimatedBackgrounds';
 
-const startFreeUrl = 'https://customer-catagorization-manager-dq6.vercel.app/login';
-const loginUrl =[{startFreeUrl}];
+const startFreeUrl = 'https://cryptox-neuron-ai.onrender.com/';
+const loginUrl = 'https://cryptox-neuron-ai.onrender.com/';
 
 const featureCards = [
   { title: 'AI Segmentation', description: 'Cluster customers using intelligent models and clear visual profiles.' },
@@ -39,7 +38,7 @@ export default function HomePage() {
           </motion.p>
           <motion.div className="hero-actions" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}>
             <a href={startFreeUrl} className="primary-button large">Start for Free</a>
-            <Link to={loginUrl[1]} className="secondary-button large">Try Demo</Link>
+            <a href={loginUrl} className="secondary-button large">Try Demo</a>
           </motion.div>
           <div className="hero-stats">
             {stats.map((stat) => (
