@@ -38,11 +38,11 @@ export default function FeaturesPage() {
             </div>
             <h3>{title}</h3>
             <p>{description}</p>
-            <div className="detail-illustration">
+            {/*<div className="detail-illustration">
               <div className="illus-core" />
               <div className="illus-line" />
               <div className="illus-chip" />
-            </div>
+            </div> */}
           </motion.article>
         ))}
       </div>

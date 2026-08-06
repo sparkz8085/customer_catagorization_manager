@@ -37,7 +37,7 @@ export default function ResourcesPage() {
               <h3>{title}</h3>
               <p>{description}</p>
             </div>
-            <button type="button" className="secondary-button">Open</button>
+            <a href="https://cryptox-neuron-ai.onrender.com/" className="secondary-button" style={{display: 'inline-block', textAlign: 'center'}}>Open</a>
           </motion.article>
         ))}
       </div>

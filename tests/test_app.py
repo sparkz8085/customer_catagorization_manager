@@ -86,8 +86,11 @@ def test_mock_callback_auth():
     assert "session" in response.cookies
 
 
-def test_custom_info_login():
-    response = client.post("/login/email", data={
+def test_custom_info_registration(monkeypatch, tmp_path):
+    monkeypatch.setattr("database.user_store.get_mongodb_client", lambda: None)
+    monkeypatch.setattr("database.user_store.LOCAL_USERS_FILE", str(tmp_path / "users.json"))
+
+    response = client.post("/register", data={
         "name": "King Arthur",
         "nickname": "Arthur",
         "email": "arthur@camelot.org",
@@ -121,6 +124,5 @@ def test_safe_unpickler_blocked():
     with pytest.raises(pickle.UnpicklingError) as exc_info:
         SafeUnpickler(io.BytesIO(data)).load()
     assert "blocked during unpickling" in str(exc_info.value)
-
 
 

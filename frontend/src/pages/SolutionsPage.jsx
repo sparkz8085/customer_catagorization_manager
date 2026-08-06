@@ -52,7 +52,7 @@ export default function SolutionsPage() {
               <h4>Use Cases</h4>
               <p>{useCase}</p>
             </div>
-            <button type="button" className="secondary-button full-width">Explore {name}</button>
+            <a href="https://cryptox-neuron-ai.onrender.com/" className="secondary-button full-width" style={{display: 'inline-block', textAlign: 'center'}}>Explore {name}</a>
           </motion.article>
         ))}
       </div>
