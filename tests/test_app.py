@@ -36,6 +36,8 @@ def test_home_page_has_security_headers():
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert response.headers["X-Frame-Options"] == "DENY"
     assert "frame-ancestors 'none'" in response.headers["Content-Security-Policy"]
+    assert 'id="Total_Spending" name="Total_Spending"' in response.text
+    assert "readonly" in response.text
 
 def test_train_route_disabled_without_secret(monkeypatch):
     monkeypatch.delenv("TRAINING_API_KEY", raising=False)
@@ -60,7 +62,6 @@ def test_prediction_endpoint_success():
         "Parental_Status": "0",
         "Children": "0",
         "Income": "50000",
-        "Total_Spending": "1000",
         "Days_as_Customer": "300",
         "Recency": "15",
         "Wines": "100",
@@ -78,6 +79,7 @@ def test_prediction_endpoint_success():
     })
     assert response.status_code == 200
     assert "Customer is in Cluster" in response.text
+    assert 'value="431.0"' in response.text
 
 def test_mock_callback_auth():
     response = client.get("/auth/mock-callback?provider=google", follow_redirects=False)
@@ -124,5 +126,4 @@ def test_safe_unpickler_blocked():
     with pytest.raises(pickle.UnpicklingError) as exc_info:
         SafeUnpickler(io.BytesIO(data)).load()
     assert "blocked during unpickling" in str(exc_info.value)
-
 

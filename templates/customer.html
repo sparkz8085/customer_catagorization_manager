@@ -153,7 +153,7 @@
                 </div>
                 <div class="col-12">
                   <label for="Total_Spending" class="form-label fw-semibold">Combined Total Spending ($)</label>
-                  <input type="number" class="form-control" id="Total_Spending" name="Total_Spending" placeholder="Sum of all categories above" required value="{{ user_data.Total_Spending if user_data else '' }}">
+                  <input type="number" step="0.01" class="form-control" id="Total_Spending" name="Total_Spending" placeholder="Auto-calculated from product spendings" readonly required value="{{ user_data.Total_Spending if user_data else '' }}">
                 </div>
               </div>
 
@@ -392,10 +392,33 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
+        const spendingInputIds = ['Wines', 'Fruits', 'Meat', 'Fish', 'Sweets', 'Gold'];
+        const totalSpendingInput = document.getElementById('Total_Spending');
         const themeLightBtn = document.getElementById('theme-light-btn');
         const themeDarkBtn = document.getElementById('theme-dark-btn');
         const predictStyleSelect = document.getElementById('predict-style-select');
         const predictCard = document.getElementById('predict-card');
+
+        function calculateTotalSpending() {
+          if (!totalSpendingInput) return;
+
+          const total = spendingInputIds.reduce((sum, id) => {
+            const input = document.getElementById(id);
+            const value = input ? Number.parseFloat(input.value) : 0;
+            return sum + (Number.isFinite(value) ? value : 0);
+          }, 0);
+
+          totalSpendingInput.value = Number.isInteger(total) ? String(total) : total.toFixed(2);
+        }
+
+        spendingInputIds.forEach((id) => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('input', calculateTotalSpending);
+            input.addEventListener('change', calculateTotalSpending);
+          }
+        });
+        calculateTotalSpending();
 
         // Theme switching helper
         function setTheme(theme) {

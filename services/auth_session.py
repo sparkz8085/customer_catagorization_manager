@@ -4,14 +4,17 @@ import json
 import base64
 import os
 import logging
+import secrets
 
 logger = logging.getLogger(__name__)
 
 # Load secret key from environment or fallback with warning
 SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
 if not SECRET_KEY:
-    logger.warning("SESSION_SECRET_KEY is not set in the environment! Using a default key for session signing.")
-    SECRET_KEY = "customer_categorizer_default_session_secret_key_change_in_prod"
+    if os.getenv("APP_ENV", "").lower() in {"prod", "production"}:
+        raise RuntimeError("SESSION_SECRET_KEY must be set in production.")
+    logger.warning("SESSION_SECRET_KEY is not set; using a generated development-only session key.")
+    SECRET_KEY = secrets.token_urlsafe(32)
 
 def _sign_data(data: str) -> str:
     """Creates a SHA256 HMAC signature of the data string."""

@@ -1,5 +1,5 @@
 import os
-import pickle
+import pickle  # nosec B403
 import pandas as pd
 from config import MODEL_PATH, PREPROCESSOR_PATH, MODEL_FEATURES, OUTLIER_FEATURES
 

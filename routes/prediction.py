@@ -48,7 +48,11 @@ async def parse_customer_input(request: Request) -> CustomerInput:
               "Fish", "Sweets", "Gold", "Web", "Catalog", "Store", "Discount_Purchases",
               "Total_Promo", "NumWebVisitsMonth"]
     payload = {field: form.get(field) for field in fields if form.get(field) not in (None, "")}
-    return CustomerInput(**payload)
+    customer_input = CustomerInput(**payload)
+    spending_fields = ["Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold"]
+    data = customer_input.model_dump() if hasattr(customer_input, "model_dump") else customer_input.dict()
+    data["Total_Spending"] = sum(data[field] for field in spending_fields)
+    return CustomerInput(**data)
 
 @router.get("/")
 async def predictGetRouteClient(request: Request):
