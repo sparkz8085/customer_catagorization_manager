@@ -5,6 +5,9 @@ import base64
 import os
 import logging
 import secrets
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 

@@ -59,40 +59,86 @@ async def api_bulk_upload(request: Request, file: UploadFile = File(...)):
         if df.empty:
             return JSONResponse(status_code=400, content={"status": "error", "message": "The uploaded file is empty."})
             
-        # Ensure column headers are strings to prevent AttributeError on .str operations
-        df.columns = df.columns.astype(str).str.strip().str.lower()
+        # Ensure column headers are strings
+        df.columns = df.columns.astype(str).str.strip()
         
-        # Check for duplicate headers
-        if len(df.columns) != len(set(df.columns)):
+        # Check for duplicate headers (case-insensitive)
+        lower_cols = [c.lower() for c in df.columns]
+        if len(lower_cols) != len(set(lower_cols)):
             return JSONResponse(status_code=400, content={"status": "error", "message": "File contains duplicate column headers."})
         
-        # Simple Column Mapping logic
+        # Comprehensive Column Mapping logic
         mapping = {
             "customer name": "Customer Name",
+            "customer_name": "Customer Name",
             "name": "Customer Name",
             "age": "Age",
             "gender": "Gender",
             "annual income": "Income",
+            "annual_income": "Income",
             "income": "Income",
             "income (usd)": "Income",
             "spending score": "Total_Spending",
-            "spending": "Total_Spending"
+            "spending": "Total_Spending",
+            "total_spending": "Total_Spending",
+            "total spending": "Total_Spending",
+            "mnttotal": "Total_Spending",
+            "days_as_customer": "Days_as_Customer",
+            "days as customer": "Days_as_Customer",
+            "daysascustomer": "Days_as_Customer",
+            "dt_customer": "Days_as_Customer",
+            "recency": "Recency",
+            "wines": "Wines",
+            "mntwines": "Wines",
+            "fruits": "Fruits",
+            "mntfruits": "Fruits",
+            "meat": "Meat",
+            "mntmeatproducts": "Meat",
+            "mntmeat": "Meat",
+            "fish": "Fish",
+            "mntfishproducts": "Fish",
+            "mntfish": "Fish",
+            "sweets": "Sweets",
+            "mntsweetproducts": "Sweets",
+            "mntsweets": "Sweets",
+            "gold": "Gold",
+            "mntgoldprods": "Gold",
+            "mntgold": "Gold",
+            "web": "Web",
+            "numwebpurchases": "Web",
+            "catalog": "Catalog",
+            "numcatalogpurchases": "Catalog",
+            "store": "Store",
+            "numstorepurchases": "Store",
+            "discount_purchases": "Discount_Purchases",
+            "discount purchases": "Discount_Purchases",
+            "numdealspurchases": "Discount_Purchases",
+            "total_promo": "Total_Promo",
+            "total promo": "Total_Promo",
+            "acceptedcmp": "Total_Promo",
+            "numwebvisitsmonth": "NumWebVisitsMonth",
+            "num web visits month": "NumWebVisitsMonth",
+            "num_web_visits_month": "NumWebVisitsMonth",
+            "numwebvisits": "NumWebVisitsMonth",
         }
+        
+        # Map CustomerInput fields directly (case-insensitive)
+        for field in CustomerInput.model_fields.keys():
+            mapping[field.lower()] = field
         
         # Rename matching columns
         new_cols = {}
         for col in df.columns:
-            if col in mapping:
-                new_cols[col] = mapping[col]
+            cleaned = col.lower()
+            if cleaned in mapping:
+                new_cols[col] = mapping[cleaned]
             else:
-                new_cols[col] = col.title()
+                new_cols[col] = col
         df.rename(columns=new_cols, inplace=True)
         
-        # Validate that essential columns exist
-        required_columns = ["Income", "Total_Spending"]
-        missing_columns = [col for col in required_columns if col not in df.columns]
-        if missing_columns:
-            return JSONResponse(status_code=400, content={"status": "error", "message": f"Missing required columns: {', '.join(missing_columns)}."})
+        # Validate essential column Income exists
+        if "Income" not in df.columns:
+            return JSONResponse(status_code=400, content={"status": "error", "message": "Missing required column: Income."})
             
         start_time = time.time()
         
@@ -100,6 +146,7 @@ async def api_bulk_upload(request: Request, file: UploadFile = File(...)):
         success_count = 0
         failed_count = 0
         category_counts = {}
+        spending_fields = ["Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold"]
         
         for idx, row in df.iterrows():
             try:
@@ -107,11 +154,18 @@ async def api_bulk_upload(request: Request, file: UploadFile = File(...)):
                 payload = {}
                 for field in CustomerInput.model_fields.keys():
                     if field in row and pd.notna(row[field]):
-                        # Validate no negative values for financial/metric fields
                         val = row[field]
-                        if isinstance(val, (int, float)) and val < 0:
-                            raise ValueError(f"Field '{field}' cannot be negative.")
-                        payload[field] = val
+                        val_str = str(val).strip()
+                        if val_str != "":
+                            num_val = float(val_str)
+                            if num_val < 0:
+                                raise ValueError(f"Field '{field}' cannot be negative ({num_val}).")
+                            payload[field] = num_val
+
+                # Dynamically calculate Total_Spending if not provided or zero
+                calc_spending = sum(float(payload.get(sf, 0)) for sf in spending_fields)
+                if ("Total_Spending" not in payload or payload["Total_Spending"] == 0) and calc_spending > 0:
+                    payload["Total_Spending"] = calc_spending
                         
                 customer_input = CustomerInput(**payload)
                 input_data = customer_input.as_prediction_values()
@@ -124,13 +178,13 @@ async def api_bulk_upload(request: Request, file: UploadFile = File(...)):
                 if pd.isna(customer_name):
                     customer_name = f"Customer_{idx+1}"
                     
-                age = row.get("Age", "N/A")
+                age = row.get("Age", payload.get("Age", "N/A"))
                 income = row.get("Income", payload.get("Income", "N/A"))
-                spending = row.get("Total_Spending", payload.get("Total_Spending", "N/A"))
+                spending = payload.get("Total_Spending", row.get("Total_Spending", "N/A"))
                 
                 results.append({
                     "row_index": idx + 1,
-                    "Customer Name": customer_name,
+                    "Customer Name": str(customer_name),
                     "Age": age,
                     "Income": income,
                     "Spending Score": spending,
@@ -148,7 +202,7 @@ async def api_bulk_upload(request: Request, file: UploadFile = File(...)):
                     customer_name = f"Row_{idx+1}"
                 results.append({
                     "row_index": idx + 1,
-                    "Customer Name": customer_name,
+                    "Customer Name": str(customer_name),
                     "Age": row.get("Age", "N/A"),
                     "Income": row.get("Income", "N/A"),
                     "Spending Score": row.get("Total_Spending", "N/A"),

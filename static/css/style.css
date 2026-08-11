@@ -1,399 +1,562 @@
-/* Customer Segmentation Dashboard Styles */
+/* ==========================================================================
+   CRYPTOX NEURON - DESIGN SYSTEM & UI STYLES
+   ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   1. GLOBAL VARIABLES & BASE THEMES
+   -------------------------------------------------------------------------- */
 :root {
-  --bg-color: #f4f6f9;
-  --text-color: #1e293b;
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --accent-cyan: #06b6d4;
+  --accent-pink: #ec4899;
+  --accent-gold: #f59e0b;
+  
+  /* Light Theme Defaults */
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  --text-muted: #64748b;
   --card-bg: #ffffff;
-  --border-color: #e2e8f0;
-  --navbar-bg: #ffffff;
-  --navbar-border: #cbd5e1;
+  --card-border: #e2e8f0;
+  --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  --navbar-bg: rgba(255, 255, 255, 0.85);
+  --navbar-border: #e2e8f0;
   --input-bg: #ffffff;
   --input-border: #cbd5e1;
-  --input-color: #1e293b;
-  --section-title-color: #64748b;
-  --section-title-border: #e2e8f0;
+  --input-text: #0f172a;
+  --input-focus-border: #4f46e5;
+  --input-focus-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+  --section-title-color: #475569;
+  --section-title-border: #cbd5e1;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
 }
 
+/* Dark Theme Defaults */
 html.dark-theme, body.dark-theme {
-  --bg-color: #0f172a;
+  --bg-color: #0b0f19;
   --text-color: #f8fafc;
-  --card-bg: #1e293b;
-  --border-color: #334155;
-  --navbar-bg: #1e293b;
-  --navbar-border: #334155;
+  --text-muted: #94a3b8;
+  --card-bg: #151c2c;
+  --card-border: #232d42;
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --navbar-bg: rgba(15, 23, 42, 0.85);
+  --navbar-border: #1e293b;
   --input-bg: #0f172a;
-  --input-border: #475569;
-  --input-color: #f8fafc;
+  --input-border: #334155;
+  --input-text: #f8fafc;
+  --input-focus-border: #6366f1;
+  --input-focus-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
   --section-title-color: #94a3b8;
   --section-title-border: #334155;
 }
 
+/* Base resets & typography */
 body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background: var(--bg-color);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
 }
 
-/* Navbar overrides */
+/* Typography overrides for cards */
+.card h1, .card h2, .card h3, .card h4, .card h5, .card h6 {
+  color: var(--text-color) !important;
+}
+
+/* Navbar */
 .navbar {
-  background-color: var(--navbar-bg) !important;
-  border-color: var(--navbar-border) !important;
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  background: var(--navbar-bg) !important;
+  border-bottom: 1px solid var(--navbar-border) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.brand-text {
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .user-name-text {
   color: var(--text-color) !important;
 }
 
-/* Card custom */
-.card, .chart-card {
-  background-color: var(--card-bg) !important;
-  color: var(--text-color) !important;
-  border: 1px solid var(--border-color) !important;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03) !important;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-.card-gradient-budget {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-  color: white !important;
-  border: none !important;
-}
-
-.card-gradient-loyalist {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
-  color: white !important;
-  border: none !important;
-}
-
-.card-gradient-vip {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-  color: white !important;
-  border: none !important;
-}
-
-.rounded-custom {
-  border-radius: 16px !important;
-}
-
+/* Form section titles */
 .form-section-title {
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   color: var(--section-title-color);
   border-bottom: 2px solid var(--section-title-border);
   padding-bottom: 6px;
+  margin-top: 20px;
   margin-bottom: 16px;
-  transition: color 0.3s ease, border-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Form Controls Base */
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 6px;
 }
 
 .form-control, .form-select {
-  background-color: var(--input-bg) !important;
-  color: var(--input-color) !important;
-  border: 1px solid var(--input-border) !important;
-  border-radius: 8px;
-  padding: 10px 12px;
-  font-size: 0.95rem;
-  transition: all 0.2s ease;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .form-control:focus, .form-select:focus {
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18) !important;
+  background-color: var(--input-bg);
+  color: var(--input-text);
+  border-color: var(--input-focus-border);
+  box-shadow: var(--input-focus-shadow);
   outline: none;
 }
 
+/* Readonly Total Spending Input */
+.input-total-spending {
+  background-color: rgba(79, 70, 229, 0.06) !important;
+  border: 1.5px dashed var(--primary-color) !important;
+  font-weight: 800 !important;
+  color: var(--primary-color) !important;
+  font-size: 1.15rem !important;
+  letter-spacing: 0.5px;
+}
+html.dark-theme .input-total-spending {
+  background-color: rgba(99, 102, 241, 0.12) !important;
+  color: #818cf8 !important;
+  border-color: #818cf8 !important;
+}
+
 .btn-predict {
-  background: #3b82f6;
-  color: white;
-  font-weight: 600;
-  padding: 12px;
-  border-radius: 8px;
-  transition: all 0.2s;
+  background: var(--primary-gradient);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 14px 20px;
+  border-radius: var(--radius-md);
   border: none;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+  transition: all 0.25s ease;
+  cursor: pointer;
 }
 
 .btn-predict:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(79, 70, 229, 0.45);
+  color: #ffffff;
 }
 
-.chart-card {
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.navbar-brand img {
-  height: 35px;
-}
-
-/* ==========================================================================
-   PREDICT CARD STYLES
-   ========================================================================== */
-
-/* 1. Medieval Style */
-.style-medieval {
-  font-family: 'Cinzel', Georgia, serif !important;
-  background-color: #f4ebd0 !important;
-  background-image: radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0), radial-gradient(rgba(0,0,0,0.03) 1px, transparent 0) !important;
-  background-size: 8px 8px !important;
-  background-position: 0 0, 4px 4px !important;
-  border: 6px double #8c6239 !important;
-  border-radius: 12px !important;
-  color: #5c3d24 !important;
-  box-shadow: 0 10px 25px rgba(140, 98, 57, 0.15) !important;
-}
-
-.style-medieval h3, .style-medieval label {
-  color: #5c3d24 !important;
-  font-weight: 700 !important;
-}
-
-.style-medieval .form-section-title {
-  color: #8c6239 !important;
-  border-bottom: 2px solid #8c6239 !important;
-}
-
-.style-medieval .form-control, .style-medieval .form-select {
-  background-color: #FAF5E6 !important;
-  border: 1px solid #8c6239 !important;
-  color: #5c3d24 !important;
-  font-family: 'Cinzel', Georgia, serif !important;
-  border-radius: 4px !important;
-}
-
-.style-medieval .form-control:focus, .style-medieval .form-select:focus {
-  box-shadow: 0 0 0 3px rgba(140, 98, 57, 0.25) !important;
-  border-color: #5c3d24 !important;
-}
-
-.style-medieval option {
-  background-color: #FAF5E6 !important;
-  color: #5c3d24 !important;
-}
-
-.style-medieval .btn-predict {
-  background: linear-gradient(135deg, #8c6239 0%, #5c3d24 100%) !important;
-  color: #FAF5E6 !important;
-  font-family: 'Cinzel', Georgia, serif !important;
-  border: 1px solid #5c3d24 !important;
-  border-radius: 4px !important;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.style-medieval .btn-predict:hover {
-  background: linear-gradient(135deg, #5c3d24 0%, #3d2512 100%) !important;
-  box-shadow: 0 4px 12px rgba(92, 61, 36, 0.3);
-}
-
-/* 2. Mythic Style */
-.style-mythic {
-  font-family: 'Orbitron', sans-serif !important;
-  background: linear-gradient(135deg, #09061c 0%, #03020d 100%) !important;
-  border: 2px solid #a855f7 !important;
-  border-radius: 20px !important;
-  color: #e9d5ff !important;
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.45), inset 0 0 15px rgba(34, 211, 238, 0.15) !important;
+/* Prediction Cards & Category Banners */
+.prediction-banner {
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-.style-mythic::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.05) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 1;
-}
-
-.style-mythic h3 {
+.card-gradient-vip {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: #ffffff !important;
-  text-shadow: 0 0 10px rgba(168, 85, 247, 0.6) !important;
 }
-
-.style-mythic label {
-  color: #c084fc !important;
-  font-weight: 500 !important;
-}
-
-.style-mythic .form-section-title {
-  color: #22d3ee !important;
-  border-bottom: 2px dashed #a855f7 !important;
-  text-shadow: 0 0 8px rgba(34, 211, 238, 0.4) !important;
-}
-
-.style-mythic .form-control, .style-mythic .form-select {
-  background-color: rgba(9, 6, 28, 0.8) !important;
-  border: 1px solid #6b21a8 !important;
-  color: #22d3ee !important;
-  font-family: 'Orbitron', sans-serif !important;
-  border-radius: 10px !important;
-}
-
-.style-mythic .form-control:focus, .style-mythic .form-select:focus {
-  border-color: #22d3ee !important;
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.5) !important;
-}
-
-.style-mythic option {
-  background-color: #09061c !important;
-  color: #22d3ee !important;
-}
-
-.style-mythic .btn-predict {
-  background: linear-gradient(135deg, #a855f7 0%, #22d3ee 100%) !important;
+.card-gradient-loyalist {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: #ffffff !important;
-  font-family: 'Orbitron', sans-serif !important;
-  border: none !important;
-  border-radius: 10px !important;
-  box-shadow: 0 0 15px rgba(34, 211, 238, 0.4) !important;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
+}
+.card-gradient-budget {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff !important;
 }
 
-.style-mythic .btn-predict:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 25px rgba(34, 211, 238, 0.7) !important;
-}
-
-/* 3. Elegant Style */
-.style-elegant {
-  font-family: 'Playfair Display', Georgia, serif !important;
-  background-color: #fdfbf7 !important;
-  border: 1px solid #d4af37 !important;
-  border-radius: 4px !important;
-  color: #1e1e1e !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05) !important;
-}
-
-.style-elegant h3 {
-  font-family: 'Playfair Display', Georgia, serif !important;
-  font-style: italic;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  color: #1e1e1e !important;
-}
-
-.style-elegant label {
-  color: #4a4a4a !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-size: 0.8rem;
-  letter-spacing: 0.5px;
-}
-
-.style-elegant .form-section-title {
-  color: #b89726 !important;
-  border-bottom: 1px solid #e5d5a2 !important;
-  font-style: italic !important;
-  font-weight: 600 !important;
-  text-transform: none !important;
-  letter-spacing: 0.5px;
-}
-
-.style-elegant .form-control, .style-elegant .form-select {
-  background-color: transparent !important;
-  border: none !important;
-  border-bottom: 1px solid #cbd5e1 !important;
-  border-radius: 0 !important;
-  color: #1e1e1e !important;
-  padding: 6px 0 !important;
-  font-family: 'Playfair Display', Georgia, serif !important;
-}
-
-.style-elegant .form-control:focus, .style-elegant .form-select:focus {
-  border-bottom: 1px solid #d4af37 !important;
-  box-shadow: none !important;
-}
-
-.style-elegant option {
-  background-color: #fdfbf7 !important;
-  color: #1e1e1e !important;
-  font-family: 'Playfair Display', Georgia, serif !important;
-}
-
-.style-elegant .btn-predict {
-  background: #1e1e1e !important;
-  color: #d4af37 !important;
-  border: 1px solid #d4af37 !important;
-  border-radius: 0 !important;
-  font-family: 'Playfair Display', Georgia, serif !important;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+/* Chart Cards Base */
+.card, .chart-card {
+  background: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 24px;
+  box-shadow: var(--card-shadow);
   transition: all 0.3s ease;
 }
 
-.style-elegant .btn-predict:hover {
-  background: #d4af37 !important;
-  color: #1e1e1e !important;
-  box-shadow: none;
+.apexcharts-canvas, .apexcharts-canvas svg {
+  background: transparent !important;
 }
 
-/* 4. Aristocrat Style */
-.style-aristocrat {
-  font-family: 'Cormorant Garamond', Georgia, serif !important;
-  background: linear-gradient(135deg, #380a13 0%, #150206 100%) !important;
-  border: 5px double #d4af37 !important;
-  border-radius: 16px !important;
-  color: #f3e5ab !important;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5) !important;
+/* Dropdown Menu Custom */
+.dropdown-menu {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25) !important;
 }
 
-.style-aristocrat h3 {
-  color: #d4af37 !important;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+
+/* ==========================================================================
+   2. THE SIX UI STYLES
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   STYLE 0: DEFAULT CLEAN (Fallback / Original Clean Professional Look)
+   -------------------------------------------------------------------------- */
+body[data-style="default"] {
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+body[data-style="default"] .card,
+body[data-style="default"] .chart-card {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
 }
 
-.style-aristocrat label {
-  color: #f3e5ab !important;
-  font-weight: 500;
+/* --------------------------------------------------------------------------
+   STYLE 1: NEUMORPHISM
+   Soft, tactile, physical interface. Dual soft light/dark shadows.
+   -------------------------------------------------------------------------- */
+body[data-style="neumorphism"] {
+  --bg-color: #e6ecf5;
+  --text-color: #2d3748;
+  --card-bg: #e6ecf5;
+  --card-border: transparent;
+  --card-shadow: 9px 9px 18px #c4cde0, -9px -9px 18px #ffffff;
+  --input-bg: #e6ecf5;
+  --input-border: transparent;
+  --input-text: #2d3748;
+  --navbar-bg: #e6ecf5;
+  --navbar-border: rgba(255, 255, 255, 0.4);
 }
 
-.style-aristocrat .form-section-title {
-  color: #d4af37 !important;
-  border-bottom: 2px solid #d4af37 !important;
-  letter-spacing: 1px;
+html.dark-theme body[data-style="neumorphism"] {
+  --bg-color: #171b26;
+  --text-color: #e2e8f0;
+  --card-bg: #171b26;
+  --card-border: transparent;
+  --card-shadow: 8px 8px 18px #0e1118, -8px -8px 18px #202534;
+  --input-bg: #171b26;
+  --input-border: transparent;
+  --input-text: #f8fafc;
+  --navbar-bg: #171b26;
+  --navbar-border: rgba(255, 255, 255, 0.05);
 }
 
-.style-aristocrat .form-control, .style-aristocrat .form-select {
-  background-color: #20050a !important;
-  border: 1px solid #8e6d19 !important;
+body[data-style="neumorphism"] .card,
+body[data-style="neumorphism"] .chart-card {
+  background: var(--card-bg) !important;
+  border-radius: 24px !important;
+  border: none !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+body[data-style="neumorphism"] .form-control,
+body[data-style="neumorphism"] .form-select {
+  background: var(--input-bg) !important;
+  border: none !important;
+  border-radius: 14px !important;
+  box-shadow: inset 4px 4px 8px #c4cde0, inset -4px -4px 8px #ffffff !important;
+}
+
+html.dark-theme body[data-style="neumorphism"] .form-control,
+html.dark-theme body[data-style="neumorphism"] .form-select {
+  box-shadow: inset 4px 4px 8px #0e1118, inset -4px -4px 8px #202534 !important;
+}
+
+body[data-style="neumorphism"] .input-total-spending {
+  box-shadow: inset 4px 4px 8px rgba(79, 70, 229, 0.25), inset -4px -4px 8px #ffffff !important;
+  border: 1px solid rgba(79, 70, 229, 0.4) !important;
+}
+
+body[data-style="neumorphism"] .btn-predict {
+  background: var(--card-bg) !important;
+  color: #4f46e5 !important;
+  border-radius: 14px !important;
+  box-shadow: 6px 6px 14px #c4cde0, -6px -6px 14px #ffffff !important;
+  border: none !important;
+  transition: all 0.2s ease;
+}
+
+html.dark-theme body[data-style="neumorphism"] .btn-predict {
+  color: #818cf8 !important;
+  box-shadow: 6px 6px 14px #0e1118, -6px -6px 14px #202534 !important;
+}
+
+body[data-style="neumorphism"] .btn-predict:active,
+body[data-style="neumorphism"] .btn-predict:hover {
+  box-shadow: inset 3px 3px 6px #c4cde0, inset -3px -3px 6px #ffffff !important;
+  transform: translateY(0);
+}
+
+html.dark-theme body[data-style="neumorphism"] .btn-predict:active,
+html.dark-theme body[data-style="neumorphism"] .btn-predict:hover {
+  box-shadow: inset 3px 3px 6px #0e1118, inset -3px -3px 6px #202534 !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   STYLE 2: BENTO GRID
+   Modular AI analytics dashboard hierarchy with distinct card sizes & accents.
+   -------------------------------------------------------------------------- */
+body[data-style="bento"] {
+  --bg-color: #f1f5f9;
+  --card-bg: #ffffff;
+  --card-border: #cbd5e1;
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+html.dark-theme body[data-style="bento"] {
+  --bg-color: #080c14;
+  --card-bg: #0f172a;
+  --card-border: #1e293b;
+  --card-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.5);
+}
+
+body[data-style="bento"] .card,
+body[data-style="bento"] .chart-card {
+  border-radius: 22px !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+body[data-style="bento"] .card:hover,
+body[data-style="bento"] .chart-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px -5px rgba(79, 70, 229, 0.12) !important;
+}
+
+body[data-style="bento"] .form-section-title {
+  background: rgba(79, 70, 229, 0.08);
+  color: #4f46e5;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border-bottom: none;
+  font-size: 0.75rem;
+}
+html.dark-theme body[data-style="bento"] .form-section-title {
+  background: rgba(99, 102, 241, 0.15);
+  color: #a5b4fc;
+}
+
+
+/* --------------------------------------------------------------------------
+   STYLE 3: SOFT UI EVOLUTION
+   Modern, refined Soft UI / SaaS interface. Clean slate typography & floating surfaces.
+   -------------------------------------------------------------------------- */
+body[data-style="soft-ui"] {
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --card-border: #f1f5f9;
+  --card-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.05), 0 8px 12px -6px rgba(0, 0, 0, 0.02);
+  --text-color: #1e293b;
+}
+
+html.dark-theme body[data-style="soft-ui"] {
+  --bg-color: #0f172a;
+  --card-bg: #1e293b;
+  --card-border: #334155;
+  --card-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.35);
+  --text-color: #f8fafc;
+}
+
+body[data-style="soft-ui"] .card,
+body[data-style="soft-ui"] .chart-card {
+  border-radius: 20px !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: var(--card-shadow) !important;
+}
+
+body[data-style="soft-ui"] .form-control,
+body[data-style="soft-ui"] .form-select {
+  background-color: var(--bg-color) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 12px !important;
+}
+
+body[data-style="soft-ui"] .btn-predict {
+  background: #4f46e5 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 20px -5px rgba(79, 70, 229, 0.4) !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   STYLE 4: LIQUID GLASS
+   Futuristic, fluid, luminous purple/violet/magenta atmospheric gradient interface.
+   -------------------------------------------------------------------------- */
+body[data-style="liquid-glass"] {
+  background: linear-gradient(135deg, #1e1b4b 0%, #31103f 40%, #4c1d95 70%, #1e1b4b 100%) fixed !important;
   color: #ffffff !important;
-  font-family: 'Cormorant Garamond', Georgia, serif !important;
-  border-radius: 6px !important;
+  --text-color: #ffffff;
+  --text-muted: #e9d5ff;
+  --input-text: #ffffff;
+  --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(236, 72, 153, 0.08) 100%);
+  --card-border: rgba(236, 72, 153, 0.3);
 }
 
-.style-aristocrat .form-control:focus, .style-aristocrat .form-select:focus {
-  border-color: #d4af37 !important;
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.35) !important;
+/* Light mode overlay adjustments for liquid glass */
+html:not(.dark-theme) body[data-style="liquid-glass"] {
+  background: linear-gradient(135deg, #f5f3ff 0%, #fae8ff 40%, #e0e7ff 70%, #f3e8ff 100%) fixed !important;
+  color: #1e1b4b !important;
+  --text-color: #1e1b4b;
+  --text-muted: #6b21a8;
+  --input-text: #1e1b4b;
+  --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(244, 114, 182, 0.15) 100%);
+  --card-border: rgba(219, 39, 119, 0.25);
 }
 
-.style-aristocrat option {
-  background-color: #20050a !important;
-  color: #f3e5ab !important;
+body[data-style="liquid-glass"] .card,
+body[data-style="liquid-glass"] .chart-card {
+  background: var(--card-bg) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 28px !important;
+  box-shadow: 0 15px 35px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  transition: all 0.3s ease;
 }
 
-.style-aristocrat .btn-predict {
-  background: linear-gradient(135deg, #d4af37 0%, #a27b1e 100%) !important;
-  color: #150206 !important;
-  font-family: 'Cormorant Garamond', Georgia, serif !important;
-  font-weight: 700 !important;
-  border: 1px solid #d4af37 !important;
-  border-radius: 6px !important;
-  text-transform: uppercase;
-  letter-spacing: 2px;
+body[data-style="liquid-glass"] .card:hover,
+body[data-style="liquid-glass"] .chart-card:hover {
+  transform: scale(1.008);
+  border-color: rgba(236, 72, 153, 0.5) !important;
+  box-shadow: 0 20px 40px rgba(236, 72, 153, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
 }
 
-.style-aristocrat .btn-predict:hover {
-  background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 100%) !important;
-  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.45);
+body[data-style="liquid-glass"] .form-control,
+body[data-style="liquid-glass"] .form-select {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(236, 72, 153, 0.3) !important;
+  border-radius: 16px !important;
+  color: var(--input-text) !important;
+  backdrop-filter: blur(10px);
+}
+
+body[data-style="liquid-glass"] .form-control:focus,
+body[data-style="liquid-glass"] .form-select:focus {
+  border-color: #ec4899 !important;
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.4) !important;
+}
+
+body[data-style="liquid-glass"] .btn-predict {
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #06b6d4 100%) !important;
+  color: #ffffff !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 30px rgba(236, 72, 153, 0.4) !important;
+}
+
+body[data-style="liquid-glass"] .btn-predict:hover {
+  box-shadow: 0 15px 35px rgba(236, 72, 153, 0.6) !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   STYLE 5: GLASSMORPHISM
+   Frosted-glass SaaS dashboard with backdrop-filter blur and thin white borders.
+   -------------------------------------------------------------------------- */
+body[data-style="glassmorphism"] {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #2e1065 100%) fixed !important;
+  color: #f8fafc !important;
+  --text-color: #f8fafc;
+  --text-muted: #cbd5e1;
+  --input-text: #f8fafc;
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.18);
+}
+
+html:not(.dark-theme) body[data-style="glassmorphism"] {
+  background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 50%, #ddd6fe 100%) fixed !important;
+  color: #0f172a !important;
+  --text-color: #0f172a;
+  --text-muted: #475569;
+  --input-text: #0f172a;
+  --card-bg: rgba(255, 255, 255, 0.65);
+  --card-border: rgba(255, 255, 255, 0.5);
+}
+
+body[data-style="glassmorphism"] .card,
+body[data-style="glassmorphism"] .chart-card {
+  background: var(--card-bg) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+body[data-style="glassmorphism"] .form-control,
+body[data-style="glassmorphism"] .form-select {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  color: var(--input-text) !important;
+  backdrop-filter: blur(8px);
+}
+
+body[data-style="glassmorphism"] .form-control:focus,
+body[data-style="glassmorphism"] .form-select:focus {
+  border-color: #818cf8 !important;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.3) !important;
+}
+
+body[data-style="glassmorphism"] .btn-predict {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 14px !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4) !important;
+}
+
+
+/* ==========================================================================
+   3. RESPONSIVE UTILITIES & ACCESSIBILITY
+   ========================================================================== */
+@media (max-width: 991.98px) {
+  .prediction-banner h1 {
+    font-size: 2.2rem !important;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .navbar-brand span {
+    font-size: 1.25rem !important;
+  }
+  .card, .chart-card {
+    padding: 18px !important;
+  }
+  .btn-predict {
+    font-size: 0.95rem;
+    padding: 12px 16px;
+  }
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

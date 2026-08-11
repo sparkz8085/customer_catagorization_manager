@@ -1,0 +1,4 @@
+Name,Age,Income,MntWines,MntFruits,MntMeatProducts,MntFishProducts,MntSweetProducts,MntGoldProds,Recency,NumDealsPurchases,NumWebPurchases,NumCatalogPurchases,NumStorePurchases,NumWebVisitsMonth
+Fiona Apple,30,31000,15,4,10,3,3,8,10,2,2,0,2,7
+George Clark,50,75000,580,60,400,90,60,70,8,1,4,5,8,3
+Hannah Lee,42,62000,520,35,190,45,35,65,18,3,6,4,8,4
