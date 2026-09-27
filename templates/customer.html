@@ -164,6 +164,7 @@
             </div>
             
             <form action="/" method="post">
+              {% if customer_id %}<input type="hidden" name="customer_id" value="{{ customer_id }}">{% endif %}
               <!-- DEMOGRAPHICS -->
               <div class="form-section-title">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -177,6 +178,33 @@
                 <div class="col-md-6">
                   <label for="Income" class="form-label">Net Income / Salary ($)</label>
                   <input type="number" class="form-control" id="Income" name="Income" placeholder="e.g. 55000" required value="{{ user_data.Income if user_data else '' }}">
+                </div>
+                <div class="col-md-4">
+                  <label for="Gender" class="form-label">Gender (Optional)</label>
+                  <select class="form-select" id="Gender" name="Gender">
+                    <option value="">Select gender</option>
+                    {% for option in ["Male", "Female", "Other", "Prefer not to say"] %}
+                    <option value="{{ option }}" {% if user_data and user_data.Gender == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="Occupation" class="form-label">Occupation (Optional)</label>
+                  <select class="form-select" id="Occupation" name="Occupation">
+                    <option value="">Select occupation</option>
+                    {% for option in ["Student", "Salaried", "Self-employed", "Business", "Unemployed", "Retired", "Other"] %}
+                    <option value="{{ option }}" {% if user_data and user_data.Occupation == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label for="Marital_Status" class="form-label">Marital Status (Optional)</label>
+                  <select class="form-select" id="Marital_Status" name="Marital_Status">
+                    <option value="">Select marital status</option>
+                    {% for option in ["Single", "Married", "Divorced", "Widowed", "Prefer not to say"] %}
+                    <option value="{{ option }}" {% if user_data and user_data.Marital_Status == option %}selected{% endif %}>{{ option }}</option>
+                    {% endfor %}
+                  </select>
                 </div>
               </div>
 

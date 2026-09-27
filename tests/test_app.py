@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from app import app
 from services.auth_session import create_session_cookie
+from routes.prediction import CustomerInput
 
 client = TestClient(app)
 
@@ -80,6 +81,49 @@ def test_prediction_endpoint_success():
     assert response.status_code == 200
     assert "Customer is in Cluster" in response.text
     assert 'value="431.0"' in response.text
+
+
+def test_optional_customer_profile_fields_can_be_empty(monkeypatch):
+    saved_payload = {}
+
+    def fake_save_customer(payload, owner_email, customer_id=None):
+        saved_payload.update(payload)
+        return {**payload, "_id": "507f1f77bcf86cd799439011"}
+
+    monkeypatch.setattr("routes.prediction.predict_customer", lambda values: 1)
+    monkeypatch.setattr("routes.prediction.save_customer", fake_save_customer)
+
+    mock_user = {
+        "email": "test.user@example.com",
+        "name": "Test User",
+        "provider": "mock"
+    }
+    auth_client = TestClient(app)
+    auth_client.cookies.set("session", create_session_cookie(mock_user))
+
+    response = auth_client.post("/", data={
+        "Age": "25", "Income": "50000", "Days_as_Customer": "300", "Recency": "15",
+        "Wines": "100", "Fruits": "50", "Meat": "200", "Fish": "50.5", "Sweets": "20",
+        "Gold": "10.5", "Web": "5", "Catalog": "2", "Store": "3",
+        "Discount_Purchases": "1", "Total_Promo": "0", "NumWebVisitsMonth": "8",
+        "Gender": "", "Occupation": "", "Marital_Status": ""
+    })
+
+    assert response.status_code == 200
+    assert saved_payload["Gender"] is None
+    assert saved_payload["Occupation"] is None
+    assert saved_payload["Marital_Status"] is None
+    assert 'name="Gender"' in response.text
+    assert 'name="Occupation"' in response.text
+    assert 'name="Marital_Status"' in response.text
+
+
+def test_optional_customer_profile_values_are_constrained():
+    customer = CustomerInput(Gender="Female", Occupation="Retired", Marital_Status="Widowed")
+
+    assert customer.Gender == "Female"
+    assert customer.Occupation == "Retired"
+    assert customer.Marital_Status == "Widowed"
 
 def test_mock_callback_auth():
     response = client.get("/auth/mock-callback?provider=google", follow_redirects=False)

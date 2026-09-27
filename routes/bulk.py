@@ -8,7 +8,7 @@ from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 import time
 from services.auth_session import verify_session_cookie
-from routes.prediction import CLUSTER_MAPPING, CustomerInput
+from routes.prediction import CLUSTER_MAPPING, CustomerInput, OPTIONAL_PROFILE_FIELDS
 import logging
 from ml.predictor import predict_customer
 
@@ -164,10 +164,13 @@ async def api_bulk_upload(request: Request, file: UploadFile = File(...)):
                         val = row[field]
                         val_str = str(val).strip()
                         if val_str != "":
-                            num_val = float(val_str)
-                            if num_val < 0:
-                                raise ValueError(f"Field '{field}' cannot be negative ({num_val}).")
-                            payload[field] = num_val
+                            if field in OPTIONAL_PROFILE_FIELDS:
+                                payload[field] = val_str
+                            else:
+                                num_val = float(val_str)
+                                if num_val < 0:
+                                    raise ValueError(f"Field '{field}' cannot be negative ({num_val}).")
+                                payload[field] = num_val
 
                 # Dynamically calculate Total_Spending if not provided or zero
                 calc_spending = sum(float(payload.get(sf, 0)) for sf in spending_fields)

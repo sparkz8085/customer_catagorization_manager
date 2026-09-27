@@ -1,14 +1,17 @@
 import os
-from typing import List
-from fastapi import APIRouter, Request, status
-from fastapi.responses import RedirectResponse
+from typing import List, Literal
+from fastapi import APIRouter, HTTPException, Request, status
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, ValidationError
 import logging
 from ml.predictor import predict_customer
 from services.auth_session import verify_session_cookie
+from database.customer_store import get_customer, save_customer
 
 logger = logging.getLogger(__name__)
+
+OPTIONAL_PROFILE_FIELDS = {"Gender", "Occupation", "Marital_Status"}
 
 router = APIRouter()
 templates_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "templates"))
@@ -32,6 +35,9 @@ class CustomerInput(BaseModel):
     Discount_Purchases: int = Field(default=0, ge=0)
     Total_Promo: int = Field(default=0, ge=0)
     NumWebVisitsMonth: int = Field(default=0, ge=0)
+    Gender: Literal["Male", "Female", "Other", "Prefer not to say"] | None = None
+    Occupation: Literal["Student", "Salaried", "Self-employed", "Business", "Unemployed", "Retired", "Other"] | None = None
+    Marital_Status: Literal["Single", "Married", "Divorced", "Widowed", "Prefer not to say"] | None = None
 
     def as_prediction_values(self) -> List[object]:
         data = self.model_dump() if hasattr(self, "model_dump") else self.dict()
@@ -46,8 +52,13 @@ async def parse_customer_input(request: Request) -> CustomerInput:
     fields = ["Age", "Income",
               "Total_Spending", "Days_as_Customer", "Recency", "Wines", "Fruits", "Meat",
               "Fish", "Sweets", "Gold", "Web", "Catalog", "Store", "Discount_Purchases",
-              "Total_Promo", "NumWebVisitsMonth"]
-    payload = {field: form.get(field) for field in fields if form.get(field) not in (None, "")}
+              "Total_Promo", "NumWebVisitsMonth", *OPTIONAL_PROFILE_FIELDS]
+    payload = {
+        field: form.get(field)
+        for field in fields
+        if form.get(field) not in (None, "")
+        and not (field == "Marital_Status" and form.get(field) in {"0", "1"})
+    }
     customer_input = CustomerInput(**payload)
     spending_fields = ["Wines", "Fruits", "Meat", "Fish", "Sweets", "Gold"]
     data = customer_input.model_dump() if hasattr(customer_input, "model_dump") else customer_input.dict()
@@ -55,17 +66,25 @@ async def parse_customer_input(request: Request) -> CustomerInput:
     return CustomerInput(**data)
 
 @router.get("/")
-async def predictGetRouteClient(request: Request):
+async def predictGetRouteClient(request: Request, customer_id: str | None = None):
     session_cookie = request.cookies.get("session")
     user = verify_session_cookie(session_cookie)
     if not user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
         
     try:
+        user_data = get_customer(customer_id, user.get("email")) if customer_id else None
         return templates.TemplateResponse(
             request,
             "customer.html",
-            {"context": None, "user_data": None, "cluster_averages": None, "error": None, "user": user},
+            {
+                "context": None,
+                "user_data": user_data,
+                "cluster_averages": None,
+                "error": None,
+                "user": user,
+                "customer_id": customer_id if user_data else None,
+            },
         )
     except Exception as e:
         from fastapi.responses import JSONResponse
@@ -73,6 +92,17 @@ async def predictGetRouteClient(request: Request):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"status": False, "error": "Unable to render page."},
         )
+
+
+@router.get("/api/customers/{customer_id}")
+async def get_customer_route(request: Request, customer_id: str):
+    user = verify_session_cookie(request.cookies.get("session"))
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+    customer = get_customer(customer_id, user.get("email"))
+    if not customer:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
+    return customer
 
 CLUSTER_MAPPING = {
     0: "Budget",
@@ -161,6 +191,14 @@ async def predictRouteClient(request: Request):
         cluster_name = CLUSTER_MAPPING.get(predicted_cluster, str(predicted_cluster))
         
         user_data = customer_input.model_dump() if hasattr(customer_input, "model_dump") else customer_input.dict()
+        form = await request.form()
+        saved_customer = save_customer(
+            {**user_data, "predicted_category": cluster_name},
+            user.get("email"),
+            form.get("customer_id") or None,
+        )
+        if saved_customer:
+            user_data = saved_customer
 
         return templates.TemplateResponse(
             request,
@@ -170,7 +208,8 @@ async def predictRouteClient(request: Request):
                 "user_data": user_data,
                 "cluster_averages": CLUSTER_AVERAGES,
                 "error": None,
-                "user": user
+                "user": user,
+                "customer_id": saved_customer.get("_id") if saved_customer else form.get("customer_id"),
             },
         )
 

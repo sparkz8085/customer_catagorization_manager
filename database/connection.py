@@ -109,7 +109,8 @@ def get_customer_dataframe() -> pd.DataFrame:
         try:
             print("[OK] Fetching dataset from MongoDB Cloud...")
             collection = get_customer_collection(client)
-            document_count = collection.count_documents({})
+            training_filter = {"record_type": {"$ne": "customer_profile"}}
+            document_count = collection.count_documents(training_filter)
             print(
                 "[INFO] MongoDB customer source: "
                 f"database={DATABASE_NAME}, collection={CUSTOMER_COLLECTION_NAME}, "
@@ -122,7 +123,7 @@ def get_customer_dataframe() -> pd.DataFrame:
                     "document_count=0. Seed the customers collection before training."
                 )
 
-            df = pd.DataFrame(list(collection.find()))
+            df = pd.DataFrame(list(collection.find(training_filter)))
             if not df.empty:
                 if "_id" in df.columns:
                     df = df.drop(columns=["_id"])
