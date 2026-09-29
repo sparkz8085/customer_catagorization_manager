@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CryptoX Neuron | Overview</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+  </head>
+  <body class="intelligence-shell">
+    <aside class="intelligence-sidebar">
+      <a href="/dashboard" class="intelligence-brand"><span class="brand-mark-small">CX</span><span><strong>CryptoX Neuron</strong><small>Customer Intelligence</small></span></a>
+      <p class="sidebar-label">Workspace</p>
+      <nav class="intelligence-nav">
+        <a class="active" href="/dashboard">Overview</a>
+        <a href="/customers">Customers</a>
+        <a href="/">AI Analysis</a>
+        <a href="/analysis-history">Analysis History</a>
+        <a href="/dashboard">Reports</a>
+      </nav>
+      <p class="sidebar-label">Account</p>
+      <nav class="intelligence-nav"><a href="/pricing">Subscription</a><a href="/">Settings</a><a class="logout-link" href="/logout">Log out</a></nav>
+    </aside>
+    <main class="intelligence-main">
+      <header class="intelligence-header"><div><p class="eyebrow">Overview</p><h1>Good day, {{ user.nickname or user.name or 'there' }}</h1><p class="muted-copy">A clear view of your customer intelligence workspace.</p></div><div class="header-actions"><a class="button button-muted" href="/bulk-upload">Import data</a><a class="button button-primary" href="/">Run analysis</a></div></header>
+      <section class="metric-grid">
+        <article class="metric-card"><span>Total customers</span><strong>{{ summary.total }}</strong><small>Across your workspace</small></article>
+        <article class="metric-card"><span>Analyzed</span><strong>{{ summary.analyzed }}</strong><small>With a current segment</small></article>
+        <article class="metric-card"><span>Pending analysis</span><strong>{{ summary.pending }}</strong><small>Ready for review</small></article>
+        <article class="metric-card"><span>Active segments</span><strong>{{ summary.segments|length }}</strong><small>Based on saved results</small></article>
+      </section>
+      <section class="dashboard-columns">
+        <article class="data-panel"><div class="panel-heading"><div><p class="eyebrow">Customer management</p><h2>Recent customers</h2></div><a href="/" class="text-link">View all</a></div>{% if customers %}<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Income</th><th>Segment</th><th>Updated</th></tr></thead><tbody>{% for customer in customers %}<tr><td><strong>{{ customer.get('Customer Name', customer.get('customer_id', 'Unnamed')) }}</strong><small>{{ customer.get('email', 'No email') }}</small></td><td>{{ customer.get('Income', '—') }}</td><td><span class="status-tag">{{ customer.get('predicted_category', 'Pending') }}</span></td><td>{{ customer.get('updated_at', '—') }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><strong>Your customer list is ready.</strong><p>Add a customer or import a file to begin building intelligence.</p><a class="button button-primary" href="/">Add customer</a></div>{% endif %}</article>
+        <article class="data-panel"><div class="panel-heading"><div><p class="eyebrow">Segmentation</p><h2>Customer segments</h2></div></div>{% if summary.segments %}<div class="segment-list">{% for segment, count in summary.segments.items() %}<div class="segment-row"><span>{{ segment }}</span><strong>{{ count }}</strong><div class="segment-bar"><i style="width: {{ (count / summary.total * 100) if summary.total else 0 }}%"></i></div></div>{% endfor %}</div>{% else %}<div class="empty-state compact"><strong>No segments yet</strong><p>Run an analysis to see how your customers group together.</p></div>{% endif %}</article>
+      </section>
+      <section class="data-panel"><div class="panel-heading"><div><p class="eyebrow">Analysis activity</p><h2>Recent analysis</h2></div><a href="/api/analysis-history" class="text-link">View history</a></div>{% if history %}<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Model</th><th>Result</th><th>Date</th></tr></thead><tbody>{% for analysis in history %}<tr><td>{{ analysis.customer_id }}</td><td>{{ analysis.model|title }}</td><td><span class="status-tag">{{ analysis.result.get('category', analysis.result.get('cluster', '—')) }}</span></td><td>{{ analysis.created_at }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state compact"><strong>No analysis history yet</strong><p>Saved predictions will appear here with their original input snapshots.</p></div>{% endif %}</section>
+    </main>
+  </body>
+</html>

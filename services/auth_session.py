@@ -80,3 +80,7 @@ def verify_session_cookie(cookie_value: str) -> dict | None:
     except Exception as e:
         logger.error(f"Failed to verify or decode session cookie: {e}")
         return None
+
+def session_owner_id(user: dict) -> str:
+    """Return the server-derived stable owner key used by scoped data queries."""
+    return str(user.get("_id") or user.get("email") or "")

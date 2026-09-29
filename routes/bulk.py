@@ -8,9 +8,13 @@ from fastapi.responses import RedirectResponse, StreamingResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 import time
 from services.auth_session import verify_session_cookie
+from services.subscriptions import has_feature
 from routes.prediction import CLUSTER_MAPPING, CustomerInput, OPTIONAL_PROFILE_FIELDS
 import logging
 from ml.predictor import predict_customer
+from database.customer_store import save_customer
+from database.analysis_store import record_analysis
+from services.auth_session import session_owner_id
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +47,8 @@ async def api_bulk_upload(request: Request, file: UploadFile = File(...)):
     user = verify_session_cookie(session_cookie)
     if not user:
         return JSONResponse(status_code=401, content={"status": "error", "message": "Unauthorized", "detail": "User not authenticated."})
+    if "subscription" in user and not has_feature(user, "bulk_analysis"):
+        return JSONResponse(status_code=403, content={"status": "error", "message": "Bulk analysis requires an active Professional or Enterprise plan."})
         
     if not file.filename:
         return JSONResponse(status_code=400, content={"status": "error", "message": "No file selected."})
@@ -204,6 +210,18 @@ async def api_bulk_upload(request: Request, file: UploadFile = File(...)):
                 })
                 success_count += 1
                 category_counts[category] = category_counts.get(category, 0) + 1
+                saved_customer = save_customer(
+                    {**payload, "Customer Name": str(customer_name), "predicted_category": category},
+                    session_owner_id(user),
+                )
+                if saved_customer:
+                    record_analysis(
+                        owner_id=session_owner_id(user),
+                        customer_id=str(saved_customer.get("_id")),
+                        model=user.get("subscription", {}).get("plan", "starter"),
+                        result={"cluster": predicted_cluster, "category": category},
+                        input_snapshot=payload,
+                    )
                 
             except Exception as e:
                 failed_count += 1

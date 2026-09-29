@@ -8,6 +8,8 @@ import logging
 from ml.predictor import predict_customer
 from services.auth_session import verify_session_cookie
 from database.customer_store import get_customer, save_customer
+from database.analysis_store import record_analysis
+from services.auth_session import session_owner_id
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +75,7 @@ async def predictGetRouteClient(request: Request, customer_id: str | None = None
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
         
     try:
-        user_data = get_customer(customer_id, user.get("email")) if customer_id else None
+        user_data = get_customer(customer_id, session_owner_id(user)) if customer_id else None
         return templates.TemplateResponse(
             request,
             "customer.html",
@@ -99,7 +101,7 @@ async def get_customer_route(request: Request, customer_id: str):
     user = verify_session_cookie(request.cookies.get("session"))
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
-    customer = get_customer(customer_id, user.get("email"))
+    customer = get_customer(customer_id, session_owner_id(user))
     if not customer:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Customer not found")
     return customer
@@ -194,11 +196,18 @@ async def predictRouteClient(request: Request):
         form = await request.form()
         saved_customer = save_customer(
             {**user_data, "predicted_category": cluster_name},
-            user.get("email"),
+            session_owner_id(user),
             form.get("customer_id") or None,
         )
         if saved_customer:
             user_data = saved_customer
+            record_analysis(
+                owner_id=session_owner_id(user),
+                customer_id=str(saved_customer.get("_id")),
+                model=user.get("subscription", {}).get("plan", "starter"),
+                result={"cluster": predicted_cluster, "category": cluster_name},
+                input_snapshot=user_data,
+            )
 
         return templates.TemplateResponse(
             request,

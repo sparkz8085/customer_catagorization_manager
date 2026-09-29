@@ -5,22 +5,25 @@ import { Hyperspeed } from '../components/AnimatedBackgrounds';
 const plans = [
   {
     name: 'Starter',
-    price: '₹0/month',
-    features: ['Basic Analytics', 'Demo Dataset', 'Community Support'],
+    price: 'Free',
+    audience: 'For individuals getting a customer workspace running.',
+    features: ['Customer management', 'Basic AI analysis', 'Basic history', 'Basic reports'],
     cta: 'Start for Free',
   },
   {
     name: 'Professional',
-    price: '₹999/month',
-    features: ['Unlimited Customers', 'AI Predictions', 'Reports', 'API Access'],
+    price: 'Contact sales',
+    audience: 'For teams that need repeatable analysis and bulk workflows.',
+    features: ['Everything in Starter', 'Bulk analysis', 'Complete history', 'Advanced reports'],
     featured: true,
-    cta: 'Start Professional',
+    cta: 'Request upgrade',
   },
   {
     name: 'Enterprise',
-    price: 'Custom Pricing',
-    features: ['Dedicated AI Models', 'Custom Integrations', 'Priority Support', 'Team Management'],
-    cta: 'Contact Sales',
+    price: 'Tailored plan',
+    audience: 'For organizations with shared intelligence and reporting needs.',
+    features: ['Everything in Professional', 'Organization features', 'Enterprise reporting', 'Higher usage capacity'],
+    cta: 'Contact sales',
   },
 ];
 
@@ -46,6 +49,7 @@ export default function PricingPage() {
             {plan.featured && <span className="featured-tag">Most Popular</span>}
             <h3>{plan.name}</h3>
             <div className="plan-price">{plan.price}</div>
+            <p>{plan.audience}</p>
             <ul>
               {plan.features.map((feature) => (
                 <li key={feature}>✔ {feature}</li>

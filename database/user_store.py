@@ -98,7 +98,8 @@ def create_user_with_password(email: str, name: str, nickname: str, plain_passwo
         "created_at": now_str,
         "last_login": now_str,
         "nickname": nickname,
-        "password": hashed_password
+        "password": hashed_password,
+        "subscription": {"plan": "starter", "status": "active", "payment_status": "not_required"},
     }
     
     # Try MongoDB first
@@ -142,6 +143,7 @@ def upsert_user(provider: str, provider_uid: str, email: str, name: str, avatar_
     # Preserve existing nickname/password if not provided in the current call
     final_nickname = nickname if nickname is not None else (existing_user.get("nickname") if existing_user else None)
     final_password = password if password is not None else (existing_user.get("password") if existing_user else None)
+    final_subscription = existing_user.get("subscription") if existing_user else None
     
     user_data = {
         "email": email_lower,
@@ -152,7 +154,8 @@ def upsert_user(provider: str, provider_uid: str, email: str, name: str, avatar_
         "created_at": created_at,
         "last_login": now_str,
         "nickname": final_nickname,
-        "password": final_password
+        "password": final_password,
+        "subscription": final_subscription or {"plan": "starter", "status": "active", "payment_status": "not_required"},
     }
     
     # Try MongoDB first

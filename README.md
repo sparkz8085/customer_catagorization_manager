@@ -46,13 +46,22 @@ MONGO_DB_URL=
 MONGO_DATABASE_NAME=cryptoxneuron
 MONGO_CUSTOMER_COLLECTION_NAME=customers
 MONGO_USER_COLLECTION_NAME=users
+MONGO_ANALYSIS_HISTORY_COLLECTION_NAME=analysis_history
+MONGO_SUBSCRIPTION_COLLECTION_NAME=subscriptions
 CORS_ORIGINS=
 TRAINING_API_KEY=
+PAYMENT_ADMIN_KEY=
 ```
 
 `CORS_ORIGINS` can be left empty for same-origin Vercel hosting. Set it to a comma-separated list only when another domain must call the API.
 
 `TRAINING_API_KEY` is optional. If it is not set, `/train` is disabled. Model training is a long-running, database and S3 write-heavy workflow, so keep it disabled for public production traffic unless you intentionally run it behind a private admin flow.
+
+## Customer intelligence workspace
+
+Authenticated users can use `/dashboard`, `/customers`, `/analysis-history`, and `/subscription`. Customer and analysis-history records are scoped by the server-derived session owner key; legacy customer documents using `owner_email` remain readable during migration. New MongoDB connections create owner, customer, history, and subscription indexes automatically.
+
+The customer APIs are paginated by default: `GET /api/customers?search=&page=1&page_size=25`, with `POST`, `PUT`, and `DELETE` operations under `/api/customers`. Analysis snapshots are available under `/api/analysis-history`. Paid plan requests go to `POST /api/subscription/upgrade` with a transaction reference and remain `pending_verification` until an operator calls the protected verification endpoint with `PAYMENT_ADMIN_KEY`.
 
 Local checks:
 

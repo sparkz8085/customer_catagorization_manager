@@ -6,7 +6,9 @@ import pandas as pd
 from config import (
     CUSTOMER_COLLECTION_NAME,
     DATABASE_NAME,
+    ANALYSIS_HISTORY_COLLECTION_NAME,
     MONGO_DB_URL_KEY,
+    SUBSCRIPTION_COLLECTION_NAME,
     USER_COLLECTION_NAME,
     is_production,
 )
@@ -54,6 +56,15 @@ def get_mongodb_client():
         )
         # Test connection
         client.admin.command('ping')
+        database = client[DATABASE_NAME]
+        database[CUSTOMER_COLLECTION_NAME].create_index("owner_id")
+        database[CUSTOMER_COLLECTION_NAME].create_index([("owner_id", 1), ("customer_id", 1)])
+        database[CUSTOMER_COLLECTION_NAME].create_index([("owner_id", 1), ("email", 1)])
+        database[ANALYSIS_HISTORY_COLLECTION_NAME].create_index("owner_id")
+        database[ANALYSIS_HISTORY_COLLECTION_NAME].create_index([("owner_id", 1), ("customer_id", 1)])
+        database[ANALYSIS_HISTORY_COLLECTION_NAME].create_index([("owner_id", 1), ("created_at", -1)])
+        database[SUBSCRIPTION_COLLECTION_NAME].create_index("user_id")
+        database[SUBSCRIPTION_COLLECTION_NAME].create_index("status")
         _mongodb_available = True
         _mongodb_client = client
         print(
@@ -87,6 +98,12 @@ def get_collection(client=None, collection_name=None):
 
 def get_customer_collection(client=None):
     return get_collection(client, CUSTOMER_COLLECTION_NAME)
+
+def get_analysis_history_collection(client=None):
+    return get_collection(client, ANALYSIS_HISTORY_COLLECTION_NAME)
+
+def get_subscription_collection(client=None):
+    return get_collection(client, SUBSCRIPTION_COLLECTION_NAME)
 
 def get_user_collection(client=None):
     return get_collection(client, USER_COLLECTION_NAME)

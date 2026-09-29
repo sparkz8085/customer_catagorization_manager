@@ -12,6 +12,8 @@ from routes.prediction import router as prediction_router
 from routes.training import router as training_router
 from routes.auth import router as auth_router
 from routes.bulk import router as bulk_router
+from routes.management import router as management_router
+from routes.subscription import router as subscription_router
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -31,7 +33,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=bool(origins),
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type", "Authorization"],
 )
 
@@ -63,6 +65,8 @@ app.include_router(auth_router)
 app.include_router(prediction_router)
 app.include_router(training_router)
 app.include_router(bulk_router)
+app.include_router(management_router)
+app.include_router(subscription_router)
 
 import logging
 from fastapi.responses import JSONResponse

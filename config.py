@@ -10,6 +10,30 @@ MONGO_DB_URL_KEY = "MONGO_DB_URL"
 DATABASE_NAME = os.getenv("MONGO_DATABASE_NAME", "cryptoxneuron")
 CUSTOMER_COLLECTION_NAME = os.getenv("MONGO_CUSTOMER_COLLECTION_NAME", "customers")
 USER_COLLECTION_NAME = os.getenv("MONGO_USER_COLLECTION_NAME", "users")
+ANALYSIS_HISTORY_COLLECTION_NAME = os.getenv("MONGO_ANALYSIS_HISTORY_COLLECTION_NAME", "analysis_history")
+SUBSCRIPTION_COLLECTION_NAME = os.getenv("MONGO_SUBSCRIPTION_COLLECTION_NAME", "subscriptions")
+
+PLAN_CONFIG = {
+    "starter": {
+        "label": "Starter",
+        "features": {"customer_management", "basic_analysis", "basic_history", "basic_reports"},
+    },
+    "professional": {
+        "label": "Professional",
+        "features": {
+            "customer_management", "basic_analysis", "basic_history", "basic_reports",
+            "bulk_analysis", "complete_history", "advanced_analysis", "advanced_reports",
+        },
+    },
+    "enterprise": {
+        "label": "Enterprise",
+        "features": {
+            "customer_management", "basic_analysis", "basic_history", "basic_reports",
+            "bulk_analysis", "complete_history", "advanced_analysis", "advanced_reports",
+            "organization_features", "enterprise_reporting",
+        },
+    },
+}
 # Model Artifact Paths
 ARTIFACTS_DIR = os.path.join(BASE_DIR, "artifacts")
 MODEL_FILE_NAME = "model.pkl"

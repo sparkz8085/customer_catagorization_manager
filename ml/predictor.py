@@ -19,12 +19,38 @@ ALLOWED_CLASSES = {
     "builtins.slice",
 }
 
+
+class _LegacyRemainderColsList(list):
+    """Compatibility container for artifacts produced by older scikit-learn versions."""
+
 class SafeUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
         class_path = f"{module}.{name}"
+        if class_path == "sklearn.compose._column_transformer._RemainderColsList":
+            return _LegacyRemainderColsList
         if class_path not in ALLOWED_CLASSES:
             raise pickle.UnpicklingError(f"Unsafe class/module '{class_path}' blocked during unpickling.")
         return super().find_class(module, name)
+
+
+def _patch_legacy_sklearn_state(value, visited=None):
+    if visited is None:
+        visited = set()
+    value_id = id(value)
+    if value_id in visited:
+        return
+    visited.add(value_id)
+    if value.__class__.__name__ == "SimpleImputer" and hasattr(value, "_fit_dtype") and not hasattr(value, "_fill_dtype"):
+        value._fill_dtype = value._fit_dtype
+    if hasattr(value, "__dict__"):
+        for child in value.__dict__.values():
+            _patch_legacy_sklearn_state(child, visited)
+    elif isinstance(value, (list, tuple, set)):
+        for child in value:
+            _patch_legacy_sklearn_state(child, visited)
+    elif isinstance(value, dict):
+        for child in value.values():
+            _patch_legacy_sklearn_state(child, visited)
 
 def safe_load_pickle(file_path: str):
     # Enforce MODEL_TRUSTED environment variable check
@@ -34,7 +60,9 @@ def safe_load_pickle(file_path: str):
             "unless the environment variable MODEL_TRUSTED is set to '1' in your environment configuration."
         )
     with open(file_path, "rb") as f:
-        return SafeUnpickler(f).load()
+        value = SafeUnpickler(f).load()
+    _patch_legacy_sklearn_state(value)
+    return value
 
 def predict_customer(input_values: list) -> int:
     """
