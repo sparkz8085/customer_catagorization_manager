@@ -100,11 +100,11 @@ async def callback_google(request: Request, code: str = None, error: str = None)
             },
             timeout=10
         )
+        token_res.raise_for_status()
         token_data = token_res.json()
-        if "error" in token_data:
-            return RedirectResponse(url=f"/login?error=Google+token+exchange+failed:+{token_data.get('error_description')}")
-            
         access_token = token_data.get("access_token")
+        if not access_token:
+            return RedirectResponse(url="/login?error=Google+login+could+not+be+completed")
         
         # Retrieve user profile info
         profile_res = requests.get(
@@ -112,6 +112,7 @@ async def callback_google(request: Request, code: str = None, error: str = None)
             headers={"Authorization": f"Bearer {access_token}"},
             timeout=10
         )
+        profile_res.raise_for_status()
         profile = profile_res.json()
         
         email = profile.get("email", "")
@@ -145,8 +146,9 @@ async def callback_google(request: Request, code: str = None, error: str = None)
         )
         return response
         
-    except Exception as e:
-        return RedirectResponse(url=f"/login?error=Google+callback+processing+failed:+{str(e)}")
+    except Exception:
+        # Keep provider responses, access tokens, and internal exceptions out of the URL.
+        return RedirectResponse(url="/login?error=Google+login+could+not+be+completed")
 
 @router.get("/auth/callback/facebook")
 async def callback_facebook(request: Request, code: str = None, error: str = None):
@@ -168,17 +170,19 @@ async def callback_facebook(request: Request, code: str = None, error: str = Non
             },
             timeout=10
         )
+        token_res.raise_for_status()
         token_data = token_res.json()
-        if "error" in token_data:
-            return RedirectResponse(url=f"/login?error=Facebook+token+exchange+failed:+{token_data['error'].get('message')}")
-            
         access_token = token_data.get("access_token")
+        if not access_token:
+            return RedirectResponse(url="/login?error=Facebook+login+could+not+be+completed")
         
         # Retrieve user profile info
         profile_res = requests.get(
-            f"https://graph.facebook.com/me?fields=id,name,email,picture.type(large)&access_token={access_token}",
+            "https://graph.facebook.com/me",
+            params={"fields": "id,name,email,picture.type(large)", "access_token": access_token},
             timeout=10
         )
+        profile_res.raise_for_status()
         profile = profile_res.json()
         
         provider_uid = profile.get("id", "")
@@ -214,8 +218,9 @@ async def callback_facebook(request: Request, code: str = None, error: str = Non
         )
         return response
         
-    except Exception as e:
-        return RedirectResponse(url=f"/login?error=Facebook+callback+processing+failed:+{str(e)}")
+    except Exception:
+        # Do not leak OAuth tokens, provider payloads, or internal exception details.
+        return RedirectResponse(url="/login?error=Facebook+login+could+not+be+completed")
 
 @router.get("/auth/mock-callback")
 async def mock_callback(request: Request, provider: str):
