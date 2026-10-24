@@ -78,5 +78,13 @@ GRID_SEARCH_PARAM_GRID = {
 APP_HOST = os.getenv("APP_HOST", "127.0.0.1")
 APP_PORT = int(os.getenv("APP_PORT", "5000"))
 
+
 def is_production() -> bool:
-    return os.getenv("APP_ENV", "").lower() in {"prod", "production"}
+    """Recognize explicit production mode and common managed-host signals."""
+    app_env = os.getenv("APP_ENV", "").lower()
+    vercel_env = os.getenv("VERCEL_ENV", "").lower()
+    return (
+        app_env in {"prod", "production"}
+        or vercel_env == "production"
+        or os.getenv("VERCEL", "").lower() in {"1", "true"}
+    )
