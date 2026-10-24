@@ -295,18 +295,27 @@
         </div>
         {% endif %}
 
-        <!-- OAuth Buttons (Google / Facebook Mock Callback preserved) -->
+        <!-- Explicitly labeled demo identities; never presented as real provider authentication. -->
+        {% if demo_auth_enabled or google_configured or facebook_configured %}
         <div class="mb-3">
-          <a class="btn-oauth btn-google" href="/auth/mock-callback?provider=google">
+          {% if demo_auth_enabled or google_configured %}
+          <a class="btn-oauth btn-google" href="{% if demo_auth_enabled %}/auth/mock-callback?provider=google{% else %}/login/google{% endif %}">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M21.35 11.1h-9.18v2.92h5.26c-.23 1.3-1.02 2.4-2.17 3.13v2.6h3.5c2.05-1.89 3.24-4.69 3.24-7.92 0-.66-.06-1.3-.65-1.75z" fill="#4285F4"/><path d="M12.17 22c2.9 0 5.33-.96 7.11-2.6l-3.5-2.6c-.98.66-2.25 1.06-3.61 1.06-2.77 0-5.12-1.86-5.95-4.38H3.56v2.75C5.35 19.94 8.5 22 12.17 22z" fill="#34A853"/><path d="M6.22 13.08a6.002 6.002 0 010-3.16V7.17H3.56a9.998 9.998 0 000 9.66l2.66-3.75z" fill="#FBBC05"/><path d="M12.17 6.5c1.58 0 3.01.55 4.13 1.64l3.09-3.09C17.5 2.9 14.07 2 12.17 2 8.5 2 5.35 4.06 3.56 7.17l2.66 2.75C7.05 8.36 9.4 6.5 12.17 6.5z" fill="#EA4335"/></svg>
-            <span>Sign in with Google</span>
+            <span>{% if demo_auth_enabled %}Try Google demo{% else %}Sign in with Google{% endif %}</span>
           </a>
+          {% endif %}
 
-          <a class="btn-oauth btn-facebook" href="/auth/mock-callback?provider=facebook">
+          {% if demo_auth_enabled or facebook_configured %}
+          <a class="btn-oauth btn-facebook" href="{% if demo_auth_enabled %}/auth/mock-callback?provider=facebook{% else %}/login/facebook{% endif %}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.99 3.66 9.12 8.44 9.88v-6.99H8.9V12h1.54V9.8c0-1.52.9-2.36 2.28-2.36.66 0 1.35.12 1.35.12v1.49h-.76c-.75 0-.98.47-.98.95V12h1.67l-.27 2.89h-1.4v6.99C18.34 21.12 22 16.99 22 12z"/></svg>
-            <span>Sign in with Facebook</span>
+            <span>{% if demo_auth_enabled %}Try Facebook demo{% else %}Sign in with Facebook{% endif %}</span>
           </a>
+          {% endif %}
         </div>
+        {% if demo_auth_enabled %}
+        <p class="text-center small text-muted mb-3">Demo access only · Starter plan · No real Google or Facebook account is connected.</p>
+        {% endif %}
+        {% endif %}
 
         <div class="divider">or continue with email</div>
 
