@@ -1,209 +1,141 @@
+<!-- Project badges -->
+<div align="center">
 
-# Customer Personality Segmentation
+# 🧠 CryptoX Neuron
+### Customer Intelligence & Segmentation
 
-## Problem statement
+**Turn customer data into clearer business insights.**
 
-In this data science project, you will build a machine learning system which will be able predict the personality of the customer using machine learning algorithms. This project will be very usefull for malls, various stores and companies which are product based. Based on customer's personal details and purchase details, we can cluster them and we can predict the customer's cluster number using classification techniques.
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Database](https://img.shields.io/badge/Database-MongoDB-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![ML](https://img.shields.io/badge/ML-scikit--learn-orange?logo=scikitlearn&logoColor=white)](https://scikit-learn.org/)
+[![Deployment](https://img.shields.io/badge/Deploy-Render-46E3B7?logo=render&logoColor=111)](https://render.com/)
+[![Project](https://img.shields.io/badge/Type-Student%20Project-blueviolet)](#)
 
-## Solution Proposed
+</div>
 
-Now the question is how to dynamically predict the cluster of the customer ?. One of the approaches which we can use of machine learning approach, where we can cluster the customer based on the details we have and predict the cluster type based on the domain knowledge and leverage previous customer data to predict the cluster.
+---
 
-Dataset used
- <html>
-<a href="https://github.com/entbappy/Branching-tutorial/blob/master/marketing_campaign.zip"> Dataset Link</a>
-</html>
+## ✨ About
 
+**CryptoX Neuron** is a student-level customer analysis web application. It helps users organise customer information, run customer segmentation/prediction workflows, and review results in a simple dashboard.
 
+## 🚀 Features
 
-## Tech Stack Used
+- 📊 **Dashboard** — customer totals, analysed records, pending analysis, and segment summaries.
+- 👥 **Customer management** — view and manage customer records.
+- 🧠 **ML analysis** — customer segmentation and prediction workflows.
+- 📁 **Bulk upload** — import customer data using a supported file format.
+- 🧾 **Analysis history** — review saved analysis results.
+- 🔐 **Account access** — login and registration flows.
+- 💳 **Subscription workflow** — plan and upgrade interface with verification controls.
+- 📱 **Responsive layout** — designed for different screen sizes.
 
-1. Python
-2. FastAPI
-3. Jinja2 templates
-4. Machine learning algorithms
-5. MongoDB
-6. AWS S3
-7. Vercel serverless functions
+## 🎨 Themes & Design
 
-## Infrastructure required
+- ☀️ **Light theme** — bright surfaces and clean cards.
+- 🌙 **Dark theme** — dark surfaces with high-contrast text.
+- 💜 **Gradient accents** — indigo/purple highlights and colourful result cards.
+- 🪟 **Modern dashboard UI** — rounded cards, soft shadows, and clear navigation.
+- ✨ **Glass-style sign-in page** — dark gradient background and translucent card.
 
-1. AWS S3
-2. MongoDB Atlas
-3. Vercel
-4. Github Actions
+*Theme availability can vary by page; the sign-in screen uses its own dark visual style.*
 
-## Production deployment on Vercel
+## 🔐 Security Highlights
 
-This repository is configured as a single Vercel project. The FastAPI app serves both the HTML frontend and backend routes through `api/index.py`.
+- 🔑 Sensitive configuration is intended to be stored in environment variables, not committed to Git.
+- 🧑‍💻 Customer and analysis-history records are scoped to the signed-in workspace.
+- 🧱 Authentication endpoints have basic rate limiting.
+- 🧪 Demo authentication is configuration-controlled and should stay disabled in production unless intentionally needed.
+- 🛡️ Training and payment-verification operations use separate keys/controls.
 
-Required Vercel environment variables:
+**Important:** these controls depend on correct deployment configuration. Never commit database URLs, session secrets, API keys, or cloud credentials. Test login and review deployment logs before sharing the app publicly.
 
-```bash
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-MONGO_DB_URL=
-MONGO_DATABASE_NAME=cryptoxneuron
-MONGO_CUSTOMER_COLLECTION_NAME=customers
-MONGO_USER_COLLECTION_NAME=users
-MONGO_ANALYSIS_HISTORY_COLLECTION_NAME=analysis_history
-MONGO_SUBSCRIPTION_COLLECTION_NAME=subscriptions
-CORS_ORIGINS=
-TRAINING_API_KEY=
-PAYMENT_ADMIN_KEY=
-```
+## 🧰 Tech Stack
 
-`CORS_ORIGINS` can be left empty for same-origin Vercel hosting. Set it to a comma-separated list only when another domain must call the API.
+| Area | Technology |
+|---|---|
+| Language | Python |
+| Web framework | FastAPI, Uvicorn |
+| UI | HTML, CSS, Jinja2, Bootstrap |
+| Machine learning | scikit-learn, HDBSCAN, pandas, NumPy |
+| Database | MongoDB Atlas |
+| Optional file storage | AWS S3 |
+| Deployment | Render |
+| Version control | Git and GitHub |
 
-`TRAINING_API_KEY` is optional. If it is not set, `/train` is disabled. Model training is a long-running, database and S3 write-heavy workflow, so keep it disabled for public production traffic unless you intentionally run it behind a private admin flow.
+## 🏪 Possible Use Cases
 
-## Customer intelligence workspace
+- 🛍️ Retail shops and shopping malls
+- 🛒 E-commerce stores
+- 👕 Fashion and lifestyle businesses
+- 📦 Small businesses tracking repeat customers
+- 📣 Marketing teams exploring customer groups
+- 🎓 Student projects and ML demonstrations
 
-Authenticated users can use `/dashboard`, `/customers`, `/analysis-history`, and `/subscription`. Customer and analysis-history records are scoped by the server-derived session owner key; legacy customer documents using `owner_email` remain readable during migration. New MongoDB connections create owner, customer, history, and subscription indexes automatically.
+It can help explore customer purchase patterns and similar spending groups. Results are decision-support signals, not guaranteed predictions.
 
-The customer APIs are paginated by default: `GET /api/customers?search=&page=1&page_size=25`, with `POST`, `PUT`, and `DELETE` operations under `/api/customers`. Analysis snapshots are available under `/api/analysis-history`. Paid plan requests go to `POST /api/subscription/upgrade` with a transaction reference and remain `pending_verification` until an operator calls the protected verification endpoint with `PAYMENT_ADMIN_KEY`.
+## 🧾 Example Customer Fields
 
-Local checks:
+Depending on the selected form or upload schema, customer records may include:
 
-```bash
-python -m compileall app.py api src tests
-python -m pip install -r requirements-dev.txt
-python -m pytest
-```
+- Customer name or ID
+- Age and basic profile information
+- Income and spending score
+- Purchase count or frequency
+- Product/category preferences
 
-## How to run
+Check the application's accepted column names before uploading a CSV. Use dummy data for demonstrations and only process real customer information when you have permission and a valid reason.
 
-Before you run this project make sure you have MongoDB Atlas account and you have the shipping dataset into it.
+## ⚙️ Run Locally
 
-Step 1. Cloning the repository.
-
-```
-
-git clone https://github.com/Machine-Learning-01/Customer_segmentation.git
-
-```
-
-Step 2. Create a conda environment.
-
-```
-
-conda create --prefix venv python=3.7 -y
-
-```
-
-```
-
-conda activate venv/
-
-```
-
-Step 3. Install the requirements
-
-```
-
-pip install -r requirements.txt
-
-```
-
-Step 4. Export the environment variable
+### 1. Clone the repository
 
 ```bash
-
-export AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID>
-
-
-export AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY>
-
-
-export AWS_DEFAULT_REGION=<AWS_DEFAULT_REGION>
-
-
-export MONGO_DB_URL=<MONGO_DB_URL>
-export MONGO_DATABASE_NAME=cryptoxneuron
-export MONGO_CUSTOMER_COLLECTION_NAME=customers
-export MONGO_USER_COLLECTION_NAME=users
-
-
+git clone https://github.com/sparkz8085/customer_catagorization_manager.git
+cd customer_catagorization_manager
 ```
 
-Step 5. Run the application server
-
-```
-
-python app.py
-
-```
-
-Step 6. Train application
+### 2. Create and activate a virtual environment
 
 ```bash
-
-curl -H "x-training-api-key: <TRAINING_API_KEY>" http://localhost:5000/train
-
+python -m venv .venv
+source .venv/bin/activate
 ```
 
-Step 7. Prediction application
+### 3. Install dependencies
 
 ```bash
-
-http://localhost:5000/
-
+python -m pip install -r requirements.txt
 ```
 
-## Run locally
+### 4. Configure environment variables
 
-1. Check if the Dockerfile is available in the project directory
-2. Build the Docker image
+Use `.env.example` as a guide to create a local `.env` file. Configure MongoDB and the session secret; add AWS credentials only if required by your setup. Never commit the real `.env` file.
 
+### 5. Start the app
+
+```bash
+uvicorn app:app --reload
 ```
 
-docker build --build-arg AWS_ACCESS_KEY_ID=<AWS_ACCESS_KEY_ID> --build-arg AWS_SECRET_ACCESS_KEY=<AWS_SECRET_ACCESS_KEY> --build-arg AWS_DEFAULT_REGION=<AWS_DEFAULT_REGION> --build-arg MONGODB_URL=<MONGODB_URL> . 
+Open the local URL printed by Uvicorn, usually http://127.0.0.1:8000.
 
-```
+## ☁️ Deployment
 
-3. Run the Docker image
+The repository includes a Render configuration. Connect the GitHub repository, confirm the build/start commands, add required environment variables in Render, and inspect the latest logs if startup fails.
 
-```
+## 📚 Project Documentation
 
-docker run -d -p 5000:5000 <IMAGE_NAME>
+See [docs/PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md) for a short student-level write-up.
 
-```
+## 🎓 Project Note
 
-## Project Architecture -
+CryptoX Neuron is a learning project demonstrating web development, database integration, and customer segmentation concepts. It is not a professionally audited production system.
 
-![WhatsApp Image 2022-09-22 at 15 29 19](https://user-images.githubusercontent.com/71321529/192722336-54016f79-89ef-4c8c-9d71-a6e91ebab03f.jpeg)
+<div align="center">
 
-## Data Collection Architecture -
+**Built with Python, curiosity, and a little machine learning.** 💜
 
-![WhatsApp Image 2022-09-22 at 15 29 10](https://user-images.githubusercontent.com/71321529/192721926-de265f9b-f301-4943-ac7d-948bff7be9a0.jpeg)
-
-## Deployment Architecture -
-
-![deployment](https://user-images.githubusercontent.com/104005791/199660875-c8e63457-432a-44cb-8a95-800870f3da15.png)
-
-## Models Used
-
-* [K-Means](https://www.javatpoint.com/k-means-clustering-algorithm-in-machine-learning)
-* [LogisticRegression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
-
-From these above models after hyperparameter optimization we selected these two models which were K-Means for clustering and Logistic Regression for classification and used the following in Pipeline.
-
-* GridSearchCV is used for Hyperparameter Optimization in the pipeline.
-
-## `src` is the main package folder which contains
-
-**Components** : Contains all components of Machine Learning Project
-
-- Data Ingestion
-- Data Validation
-- Data Transformation
-- Data Clustering
-- Model Trainer
-- Model Evaluation
-- Model Pusher
-
-**Custom Logger and Exceptions** are used in the Project for better debugging purposes.
-
-## Conclusion
-
-- This Project can be used in real-life by Users.
+</div>
