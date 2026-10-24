@@ -78,9 +78,20 @@ def _consume_auth_rate_limit(request: Request) -> int | None:
             return max(1, math.ceil(window_seconds - (now - timestamps[0])))
         timestamps.append(now)
         _AUTH_RATE_BUCKETS[key] = timestamps
-        # Bound memory usage under many distinct client IPs.
+        # Prune expired buckets first; cap the map without resetting every active limit.
         if len(_AUTH_RATE_BUCKETS) > 5000:
-            _AUTH_RATE_BUCKETS.clear()
+            for bucket_key, bucket in list(_AUTH_RATE_BUCKETS.items()):
+                fresh = [stamp for stamp in bucket if now - stamp < 60 * 60]
+                if fresh:
+                    _AUTH_RATE_BUCKETS[bucket_key] = fresh
+                else:
+                    _AUTH_RATE_BUCKETS.pop(bucket_key, None)
+            if len(_AUTH_RATE_BUCKETS) > 5000:
+                oldest_key = min(
+                    _AUTH_RATE_BUCKETS,
+                    key=lambda bucket_key: _AUTH_RATE_BUCKETS[bucket_key][-1],
+                )
+                _AUTH_RATE_BUCKETS.pop(oldest_key, None)
     return None
 
 
