@@ -1,4 +1,7 @@
 import os
+import math
+import time
+import threading
 from pathlib import Path
 from typing import List
 
@@ -37,14 +40,68 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
+# Per-process baseline rate limits for authentication endpoints.
+# For multi-instance/serverless production, use a shared Redis/API-gateway limiter as well.
+_AUTH_RATE_LIMITS = {
+    ("POST", "/login/email"): (8, 15 * 60),
+    ("POST", "/register"): (5, 60 * 60),
+    ("GET", "/auth/mock-callback"): (8, 15 * 60),
+    ("GET", "/login/google"): (10, 15 * 60),
+    ("GET", "/login/facebook"): (10, 15 * 60),
+    ("GET", "/auth/callback/google"): (10, 15 * 60),
+    ("GET", "/auth/callback/facebook"): (10, 15 * 60),
+}
+_AUTH_RATE_BUCKETS = {}
+_AUTH_RATE_LOCK = threading.Lock()
+
+
+def _rate_limit_client_key(request: Request) -> str:
+    # Only trust forwarding headers when deployment is behind a configured trusted proxy.
+    trust_proxy = os.getenv("TRUST_PROXY_HEADERS", "").lower() in {"1", "true", "yes"}
+    forwarded_for = request.headers.get("x-forwarded-for", "") if trust_proxy else ""
+    if forwarded_for:
+        return forwarded_for.split(",", 1)[0].strip() or "unknown"
+    return request.client.host if request.client else "unknown"
+
+
+def _consume_auth_rate_limit(request: Request) -> int | None:
+    limit = _AUTH_RATE_LIMITS.get((request.method, request.url.path))
+    if not limit:
+        return None
+    max_requests, window_seconds = limit
+    now = time.monotonic()
+    key = (request.url.path, _rate_limit_client_key(request))
+    with _AUTH_RATE_LOCK:
+        timestamps = [stamp for stamp in _AUTH_RATE_BUCKETS.get(key, []) if now - stamp < window_seconds]
+        if len(timestamps) >= max_requests:
+            _AUTH_RATE_BUCKETS[key] = timestamps
+            return max(1, math.ceil(window_seconds - (now - timestamps[0])))
+        timestamps.append(now)
+        _AUTH_RATE_BUCKETS[key] = timestamps
+        # Bound memory usage under many distinct client IPs.
+        if len(_AUTH_RATE_BUCKETS) > 5000:
+            _AUTH_RATE_BUCKETS.clear()
+    return None
+
+
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
-    if request.method in {"POST", "PUT", "PATCH", "DELETE"} and request.cookies.get("session"):
+    retry_after = _consume_auth_rate_limit(request)
+    if retry_after is not None:
+        response = JSONResponse(
+            status_code=429,
+            content={"status": False, "message": "Too many authentication attempts. Please try again later."},
+            headers={"Retry-After": str(retry_after)},
+        )
+    elif request.method in {"POST", "PUT", "PATCH", "DELETE"} and request.cookies.get("session"):
         origin = request.headers.get("origin")
         expected_origin = f"{request.url.scheme}://{request.url.netloc}"
         if origin and origin.rstrip("/") != expected_origin.rstrip("/"):
-            return JSONResponse(status_code=403, content={"status": False, "message": "Cross-origin request rejected."})
-    response = await call_next(request)
+            response = JSONResponse(status_code=403, content={"status": False, "message": "Cross-origin request rejected."})
+        else:
+            response = await call_next(request)
+    else:
+        response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
