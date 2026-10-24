@@ -1,5 +1,6 @@
 import os
 import secrets
+import uuid
 import requests
 from urllib.parse import urlencode
 from fastapi import APIRouter, Request, Response, status, Form
@@ -20,6 +21,14 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
 FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID", "")
 FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET", "")
 
+def demo_auth_enabled() -> bool:
+    """Allow mock identities in development by default; production requires explicit opt-in."""
+    configured = os.getenv("DEMO_AUTH_ENABLED")
+    if configured is None:
+        return not is_production()
+    return configured.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def get_redirect_uri(request: Request, provider: str) -> str:
     """Helper to dynamically construct the redirect URI securely."""
     base_url = os.getenv("APP_BASE_URL")
@@ -38,18 +47,15 @@ def _valid_oauth_state(request: Request, state: str | None) -> bool:
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, error: str = None, info: str = None):
-    # Pass whether real client IDs are configured to toggle simulation notices in UI
-    google_configured = bool(GOOGLE_CLIENT_ID)
-    facebook_configured = bool(FACEBOOK_CLIENT_ID)
-    
     return templates.TemplateResponse(
         request,
         "login.html",
         {
             "error": error,
             "info": info,
-            "google_configured": google_configured,
-            "facebook_configured": facebook_configured
+            "google_configured": bool(GOOGLE_CLIENT_ID),
+            "facebook_configured": bool(FACEBOOK_CLIENT_ID),
+            "demo_auth_enabled": demo_auth_enabled(),
         }
     )
 
@@ -224,37 +230,45 @@ async def callback_facebook(request: Request, code: str = None, error: str = Non
 
 @router.get("/auth/mock-callback")
 async def mock_callback(request: Request, provider: str):
-    """Simulates a successful OAuth login for local development and reviewers."""
-    if is_production():
-        return RedirectResponse(url="/login?error=Mock+login+is+disabled")
+    """Create a clearly marked, per-visitor demo identity; never claims real OAuth authentication."""
+    if not demo_auth_enabled():
+        return RedirectResponse(url="/login?error=Demo+sign-in+is+disabled")
+    if provider not in {"google", "facebook"}:
+        return RedirectResponse(url="/login?error=Unknown+demo+provider")
+
+    demo_id = uuid.uuid4().hex
     if provider == "facebook":
-        name = "Facebook Socialite"
-        email = "facebook.user@example.com"
+        name = "Facebook Demo"
         avatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150"
-        provider_uid = "mock-fb-888999"
     else:
-        # Default to google
-        provider = "google"
-        name = "Google Explorer"
-        email = "google.user@example.com"
+        name = "Google Demo"
         avatar = "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150"
-        provider_uid = "mock-google-111222"
-        
-    user = upsert_user(
-        provider=provider,
-        provider_uid=provider_uid,
-        email=email,
-        name=name,
-        avatar_url=avatar
-    )
-    
+
+    # Do not persist or upsert a shared fake account. A random owner ID isolates each demo visitor.
+    user = {
+        "_id": f"demo-{demo_id}",
+        "email": f"{provider}.demo.{demo_id}@example.invalid",
+        "name": name,
+        "avatar_url": avatar,
+        "provider": f"mock-{provider}",
+        "provider_uid": f"mock-{provider}-{demo_id}",
+        "demo": True,
+        "subscription": {
+            "plan": "starter",
+            "status": "active",
+            "payment_status": "not_required",
+        },
+    }
+
     session_cookie = create_session_cookie(user)
+    if not session_cookie:
+        return RedirectResponse(url="/login?error=Demo+sign-in+could+not+be+completed")
     response = RedirectResponse(url="/?welcome=true", status_code=status.HTTP_303_SEE_OTHER)
     response.set_cookie(
         key="session",
         value=session_cookie,
         httponly=True,
-        max_age=86400 * 30,
+        max_age=86400,
         samesite="lax",
         secure=request.url.scheme == "https"
     )
